@@ -68,20 +68,22 @@ export class GoogleMusicActivityService extends ActivityService {
         var self = this;
 
         this.api.getCurrentTime().then(function(time) {
+            // Update activity state
             if(self.session.time !== null) {
-                // Update activity state
                 if (time > self.session.time) {
                     self.session.state = SessionState.playing;
                 } else if (time <= self.session.time) {
                     self.session.state = SessionState.paused;
                 }
-
-                // Emit event
-                self.emit('progress', self.session);
             }
 
             // Add new sample
             self.session.samples.push(time);
+
+            // Emit event
+            if(self.session.time !== null) {
+                self.emit('progress', self.session.dump());
+            }
 
             // Check if session is still active
             if(sessionKey !== self.session.key) {
