@@ -8,6 +8,8 @@ import Plugin from '../../core/plugin';
 
 import PlayerAPI from './player-api';
 
+var PROGRESS_EVENT_INTERVAL = 5000;  // (in milliseconds)
+
 
 export class GoogleMusicActivityService extends ActivityService {
     constructor() {
@@ -65,36 +67,63 @@ export class GoogleMusicActivityService extends ActivityService {
     }
 
     read(sessionKey) {
-        var self = this;
-
-        this.api.getCurrentTime().then(function(time) {
+        this.api.getCurrentTime().then((time) => {
             // Update activity state
-            if(self.session.time !== null) {
-                if (time > self.session.time) {
-                    self.session.state = SessionState.playing;
-                } else if (time <= self.session.time) {
-                    self.session.state = SessionState.paused;
+            var state = this.session.state;
+
+            if(this.session.time !== null) {
+                if (time > this.session.time) {
+                    state = SessionState.playing;
+                } else if (time <= this.session.time) {
+                    state = SessionState.paused;
                 }
             }
 
             // Add new sample
-            self.session.samples.push(time);
+            this.session.samples.push(time);
 
             // Emit event
-            if(self.session.time !== null) {
-                self.emit('progress', self.session.dump());
+            if(this.session.state !== state) {
+                var previous = this.session.state;
+                this.session.state = state;
+
+                // Emit state change
+                this._onStateChanged(previous, state)
+            } else if(this.session.state === SessionState.playing && this.session.time !== null) {
+                this.session.state = state;
+
+                // Emit progress
+                this.emit('progress', this.session.dump());
             }
 
             // Check if session is still active
-            if(sessionKey !== self.session.key) {
+            if(sessionKey !== this.session.key) {
                 return;
             }
 
             // Queue next read
-            setTimeout(function() {
-                self.read(sessionKey);
-            }, 5000);
+            setTimeout(() => {
+                this.read(sessionKey);
+            }, PROGRESS_EVENT_INTERVAL);
         });
+    }
+
+    _onStateChanged(previous, current) {
+        if(this.session === null) {
+            return false;
+        }
+
+        // Determine event from state change
+        var event = null;
+
+        if((previous === SessionState.null || previous === SessionState.paused) && current === SessionState.playing) {
+            event = 'started';
+        } else if(current === SessionState.paused) {
+            event = 'paused';
+        }
+
+        // Emit event
+        this.emit(event, this.session.dump());
     }
 
     _onMutations(mutations) {
@@ -172,29 +201,40 @@ export class GoogleMusicActivityService extends ActivityService {
             SessionState.LOADING
         );
 
+        if(this.session !== null) {
+            this.emit('created', this.session.dump());
+        }
+
         // Start watching track progress
         this.read(this.session.key);
     }
 
     _constructTrack($track, $album, $artist) {
+        var artistId = $artist.getAttribute('data-id');
+        var albumId = $album.getAttribute('data-id');
+
+        // Build track id
+        var trackId = albumId + '/' + encodeURIComponent($track.innerText).replace(/%20/g, '+');
+
+        // Construct track
         return new Track(
             this.plugin,
-            $track.innerText,
+            trackId,
             $track.innerText,
 
             new Artist(
                 this.plugin,
-                $artist.getAttribute('data-id'),
+                artistId,
                 $artist.innerText
             ),
             new Album(
                 this.plugin,
-                $album.getAttribute('data-id'),
+                albumId,
                 $album.innerText,
 
                 new Artist(
                     this.plugin,
-                    $artist.getAttribute('data-id'),
+                    artistId,
                     $artist.innerText
                 )
             )
