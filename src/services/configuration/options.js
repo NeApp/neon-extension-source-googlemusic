@@ -1,13 +1,14 @@
-export default {
-    enabled: {type: 'enable', label: 'Enabled'},
+import {
+    CheckboxOption,
+    EnableOption,
+    Group
+} from 'eon.extension.framework/services/configuration/models';
 
-    activity: {
-        enabled: {type: 'enable', label: 'Enabled'},
-    },
+import Plugin from '../../core/plugin';
 
-    sync: {
-        enabled: {type: 'enable', label: 'Enabled'},
 
-        ratings: {type: 'checkbox', label: 'Synchronize ratings'}
-    }
-};
+export default [
+    new EnableOption(Plugin, 'enabled', 'Enabled', {
+        default: false
+    })
+];
