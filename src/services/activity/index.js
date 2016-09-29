@@ -193,6 +193,11 @@ export class GoogleMusicActivityService extends ActivityService {
             return;
         }
 
+        // Emit "ended" event (if there is an existing session)
+        if(this.session !== null) {
+            this.emit('ended', this.session.dump());
+        }
+
         // Construct new session
         this.session = new Session(
             this.plugin,
@@ -201,9 +206,8 @@ export class GoogleMusicActivityService extends ActivityService {
             SessionState.LOADING
         );
 
-        if(this.session !== null) {
-            this.emit('created', this.session.dump());
-        }
+        // Emit "created" event
+        this.emit('created', this.session.dump());
 
         // Start watching track progress
         this.read(this.session.key);
