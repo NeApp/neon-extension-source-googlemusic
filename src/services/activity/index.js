@@ -194,7 +194,8 @@ export class GoogleMusicActivityService extends ActivityService {
         }
 
         // Emit "ended" event (if there is an existing session)
-        if(this.session !== null) {
+        if(this.session !== null && this.session.state !== SessionState.ended) {
+            this.session.state = SessionState.ended;
             this.emit('ended', this.session.dump());
         }
 
