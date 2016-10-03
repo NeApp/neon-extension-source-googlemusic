@@ -8,7 +8,7 @@ import Plugin from '../../core/plugin';
 
 import PlayerAPI from './player-api';
 
-var PROGRESS_EVENT_INTERVAL = 5000;  // (in milliseconds)
+const PROGRESS_EVENT_INTERVAL = 5000;  // (in milliseconds)
 
 
 export class GoogleMusicActivityService extends ActivityService {
@@ -28,15 +28,13 @@ export class GoogleMusicActivityService extends ActivityService {
     }
 
     initialize() {
-        var self = this;
-
         // Find "#playerSongInfo" element
-        var $playerSongInfo = document.querySelector('#playerSongInfo');
+        let $playerSongInfo = document.querySelector('#playerSongInfo');
 
         if($playerSongInfo === null) {
             console.warn('Unable to find the "#playerSongInfo" element, will try again in 500ms');
-            setTimeout(function() {
-                self.initialize();
+            setTimeout(() => {
+                this.initialize();
             }, 500);
             return;
         }
@@ -45,8 +43,8 @@ export class GoogleMusicActivityService extends ActivityService {
         this.api = new PlayerAPI(document);
 
         // Construct mutation observer
-        this.observer = new MutationObserver(function(mutations) {
-            self._onMutations(mutations);
+        this.observer = new MutationObserver((mutations) => {
+            this._onMutations(mutations);
         });
 
         // Listen for player song info changes
@@ -56,25 +54,25 @@ export class GoogleMusicActivityService extends ActivityService {
     }
 
     getTrackDuration() {
-        var $node = document.querySelector('#material-player-progress');
+        let $node = document.querySelector('#material-player-progress');
 
         if($node === null) {
             console.error('Unable to find "#material-player-progress" element');
             return null;
         }
 
-        return parseInt($node.getAttribute('aria-valuemax'));
+        return parseInt($node.getAttribute('aria-valuemax'), 10);
     }
 
     read(sessionKey) {
         this.api.getCurrentTime().then((time) => {
             // Update activity state
-            var state = this.session.state;
+            let state = this.session.state;
 
             if(this.session.time !== null) {
-                if (time > this.session.time) {
+                if(time > this.session.time) {
                     state = SessionState.playing;
-                } else if (time <= this.session.time) {
+                } else if(time <= this.session.time) {
                     state = SessionState.paused;
                 }
             }
@@ -84,11 +82,12 @@ export class GoogleMusicActivityService extends ActivityService {
 
             // Emit event
             if(this.session.state !== state) {
-                var previous = this.session.state;
+                let previous = this.session.state;
+
                 this.session.state = state;
 
                 // Emit state change
-                this._onStateChanged(previous, state)
+                this._onStateChanged(previous, state);
             } else if(this.session.state === SessionState.playing && this.session.time !== null) {
                 this.session.state = state;
 
@@ -110,11 +109,11 @@ export class GoogleMusicActivityService extends ActivityService {
 
     _onStateChanged(previous, current) {
         if(this.session === null) {
-            return false;
+            return;
         }
 
         // Determine event from state change
-        var event = null;
+        let event = null;
 
         if((previous === SessionState.null || previous === SessionState.paused) && current === SessionState.playing) {
             event = 'started';
@@ -127,16 +126,16 @@ export class GoogleMusicActivityService extends ActivityService {
     }
 
     _onMutations(mutations) {
-        for(var i = 0; i < mutations.length; ++i) {
+        for(let i = 0; i < mutations.length; ++i) {
             this._onMutation(mutations[i]);
         }
     }
 
     _onMutation(mutation) {
-        for(var i = 0; i < mutation.addedNodes.length; ++i) {
-            var node = mutation.addedNodes[i];
+        for(let i = 0; i < mutation.addedNodes.length; ++i) {
+            let node = mutation.addedNodes[i];
 
-            if(node.className === "now-playing-info-wrapper") {
+            if(node.className === 'now-playing-info-wrapper') {
                 this._onPlayingInfoChanged(node);
             }
         }
@@ -144,7 +143,7 @@ export class GoogleMusicActivityService extends ActivityService {
 
     _onPlayingInfoChanged(node) {
         // Find track title element
-        var $track = node.querySelector('#currently-playing-title');
+        let $track = node.querySelector('#currently-playing-title');
 
         if($track === null) {
             console.error('Unable to find "#currently-playing-title" element');
@@ -152,7 +151,7 @@ export class GoogleMusicActivityService extends ActivityService {
         }
 
         // Find album title element
-        var $album = node.querySelector('.player-album');
+        let $album = node.querySelector('.player-album');
 
         if($album === null) {
             console.error('Unable to find ".player-album" element');
@@ -160,7 +159,7 @@ export class GoogleMusicActivityService extends ActivityService {
         }
 
         // Find artist title element
-        var $artist = node.querySelector('.player-artist');
+        let $artist = node.querySelector('.player-artist');
 
         if($artist === null) {
             console.error('Unable to find ".player-artist" element');
@@ -168,7 +167,7 @@ export class GoogleMusicActivityService extends ActivityService {
         }
 
         // Build track object
-        var track = this._constructTrack(
+        let track = this._constructTrack(
             $track,
             $album,
             $artist
@@ -215,11 +214,11 @@ export class GoogleMusicActivityService extends ActivityService {
     }
 
     _constructTrack($track, $album, $artist) {
-        var artistId = $artist.getAttribute('data-id');
-        var albumId = $album.getAttribute('data-id');
+        let artistId = $artist.getAttribute('data-id');
+        let albumId = $album.getAttribute('data-id');
 
         // Build track id
-        var trackId = albumId + '/' + encodeURIComponent($track.innerText).replace(/%20/g, '+');
+        let trackId = albumId + '/' + encodeURIComponent($track.innerText).replace(/%20/g, '+');
 
         // Construct track
         return new Track(

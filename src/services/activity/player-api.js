@@ -1,20 +1,18 @@
-var REQUEST_TIMEOUT = 5;  // (in seconds)
-var RESPONSE_KEYS = [
+const REQUEST_TIMEOUT = 5;  // (in seconds)
+const RESPONSE_KEYS = [
     'time'
 ];
 
 
 export default class GoogleMusicPlayerAPI {
     constructor(document) {
-        var self = this;
-
-        this.node = document.getElementById("player-api");
+        this.node = document.getElementById('player-api');
 
         this._responseCallback = null;
 
         // Bind to "playerApiReturn" events
-        this.node.addEventListener('playerApiReturn', function(event) {
-            self._onResponse(event);
+        this.node.addEventListener('playerApiReturn', (event) => {
+            this._onResponse(event);
         });
     }
 
@@ -22,7 +20,7 @@ export default class GoogleMusicPlayerAPI {
         options = typeof options !== 'undefined' ? options : {};
 
         // Create request event
-        var event = new CustomEvent("playerApi", {
+        let event = new CustomEvent('playerApi', {
             detail: JSON.stringify([
                 code,
                 null,
@@ -33,14 +31,12 @@ export default class GoogleMusicPlayerAPI {
         });
 
         // Return promise
-        var self = this;
-
-        return new Promise(function(resolve, reject) {
-            var timeout = null;
+        return new Promise((resolve, reject) => {
+            let timeout = null;
 
             // Store resolve callback if we are expecting a response
-            if(self._hasResponse(code)) {
-                self._responseCallback = function(result) {
+            if(this._hasResponse(code)) {
+                this._responseCallback = function(result) {
                     // Cancel timeout trigger
                     if(timeout != null) {
                         clearTimeout(timeout);
@@ -52,10 +48,10 @@ export default class GoogleMusicPlayerAPI {
             }
 
             // Dispatch request event
-            self.node.dispatchEvent(event);
+            this.node.dispatchEvent(event);
 
             // Handle response
-            if(self._hasResponse(code)) {
+            if(this._hasResponse(code)) {
                 // Reject promise if no response is returned within 5 seconds
                 timeout = setTimeout(function() {
                     reject('No response returned within ' + REQUEST_TIMEOUT + ' second(s)');
@@ -76,7 +72,7 @@ export default class GoogleMusicPlayerAPI {
     }
 
     _onResponse(event) {
-        var response = event.detail;
+        let response = event.detail;
 
         if(response == null) {
             console.warn('Invalid response returned:', response);
@@ -84,26 +80,26 @@ export default class GoogleMusicPlayerAPI {
         }
 
         // Find response code
-        var code = null;
+        let code = null;
 
-        for(var key in response) {
+        for(let key in response) {
             if(!response.hasOwnProperty(key)) {
                 continue;
             }
 
-            if(RESPONSE_KEYS.indexOf(key) == -1 && typeof response[key] === 'number') {
+            if(RESPONSE_KEYS.indexOf(key) === -1 && typeof response[key] === 'number') {
                 code = response[key];
             }
         }
 
-        if(code == null) {
+        if(code === null) {
             console.warn('Unable to find response code in response object:', response);
             return;
         }
 
         // Current time response
         if(code === 9 && this._responseCallback !== null) {
-            var callback = this._responseCallback;
+            let callback = this._responseCallback;
 
             // Clear stored promise
             this._responseCallback = null;
