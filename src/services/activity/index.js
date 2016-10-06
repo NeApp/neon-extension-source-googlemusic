@@ -1,6 +1,6 @@
 import ActivityService from 'eon.extension.framework/services/source/activity';
-import Bus from 'eon.extension.framework/core/bus';
 import Registry from 'eon.extension.framework/core/registry';
+import MessagingBus, {ContextTypes} from 'eon.extension.framework/messaging/bus';
 import Session, {SessionState} from 'eon.extension.framework/models/activity/session';
 import {Track, Album, Artist} from 'eon.extension.framework/models/metadata/music';
 
@@ -27,8 +27,9 @@ export class GoogleMusicActivityService extends ActivityService {
     initialize() {
         super.initialize();
 
-        // Configure event bus
-        Bus.configure('service/activity');
+        // Construct messaging bus
+        this.bus = new MessagingBus(Plugin.id + ':activity');
+        this.bus.connect('eon.extension.core:scrobble');
 
         // Bind to document
         this.bind();
@@ -97,7 +98,7 @@ export class GoogleMusicActivityService extends ActivityService {
                 this.session.state = state;
 
                 // Emit progress
-                this.emit('progress', this.session.dump());
+                this.bus.emit('activity.progress', this.session.dump());
             }
 
             // Check if session is still active
@@ -121,13 +122,15 @@ export class GoogleMusicActivityService extends ActivityService {
         let event = null;
 
         if((previous === SessionState.null || previous === SessionState.paused) && current === SessionState.playing) {
-            event = 'started';
+            event = 'activity.started';
         } else if(current === SessionState.paused) {
-            event = 'paused';
+            event = 'activity.paused';
+        } else {
+            return;
         }
 
         // Emit event
-        this.emit(event, this.session.dump());
+        this.bus.emit(event, this.session.dump());
     }
 
     _onMutations(mutations) {
@@ -200,7 +203,7 @@ export class GoogleMusicActivityService extends ActivityService {
         // Emit "ended" event (if there is an existing session)
         if(this.session !== null && this.session.state !== SessionState.ended) {
             this.session.state = SessionState.ended;
-            this.emit('ended', this.session.dump());
+            this.bus.emit('activity.ended', this.session.dump());
         }
 
         // Construct new session
@@ -212,7 +215,7 @@ export class GoogleMusicActivityService extends ActivityService {
         );
 
         // Emit "created" event
-        this.emit('created', this.session.dump());
+        this.bus.emit('activity.created', this.session.dump());
 
         // Start watching track progress
         this.read(this.session.key);
