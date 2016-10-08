@@ -9,7 +9,9 @@
         {"pageUrl": {"hostEquals": "play.google.com", "pathPrefix": "/music"}}
       ],
       "js": [
-        "source.googlemusic/source.googlemusic.js"
+        "vendor.js",
+        "shared.js",
+        "source/googlemusic/googlemusic.js"
       ]
     }
   ],
