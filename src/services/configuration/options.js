@@ -7,6 +7,9 @@ import Plugin from '../../core/plugin';
 
 export default [
     new EnableOption(Plugin, 'enabled', 'Enabled', {
-        default: false
+        default: false,
+
+        contentScripts: Plugin.contentScripts,
+        permissions: Plugin.permissions
     })
 ];

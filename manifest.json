@@ -2,18 +2,21 @@
   "name": "Google Play Music",
   "version": "0.1.0",
 
-  "permissions": [
-    "https://play.google.com/music/*"
-  ],
-
   "content_scripts": [
     {
-      "matches": [
-        "https://play.google.com/music/*"
+      "id": "source.googlemusic/main",
+      "conditions": [
+        {"pageUrl": {"hostEquals": "play.google.com", "pathPrefix": "/music"}}
       ],
       "js": [
         "source.googlemusic/source.googlemusic.js"
       ]
     }
-  ]
+  ],
+
+  "permissions": {
+    "origins": [
+      "*://play.google.com/music/*"
+    ]
+  }
 }

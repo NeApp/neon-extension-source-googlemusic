@@ -22,20 +22,25 @@ export class GoogleMusicActivityService extends ActivityService {
         this.track = null;
 
         this._nextSessionKey = 0;
-
-        // Configure event bus
-        Bus.configure('service/activity');
     }
 
     initialize() {
+        super.initialize();
+
+        // Configure event bus
+        Bus.configure('service/activity');
+
+        // Bind to document
+        this.bind();
+    }
+
+    bind() {
         // Find "#playerSongInfo" element
         let $playerSongInfo = document.querySelector('#playerSongInfo');
 
         if($playerSongInfo === null) {
             console.warn('Unable to find the "#playerSongInfo" element, will try again in 500ms');
-            setTimeout(() => {
-                this.initialize();
-            }, 500);
+            setTimeout(() => this.bind(), 500);
             return;
         }
 
