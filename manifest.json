@@ -6,7 +6,10 @@
     {
       "id": "source.googlemusic/main",
       "conditions": [
-        {"pageUrl": {"hostEquals": "play.google.com", "pathPrefix": "/music"}}
+        {
+          "pattern": "*://play.google.com/music/*",
+          "pageUrl": {"hostEquals": "play.google.com", "pathPrefix": "/music"}
+        }
       ],
       "js": [
         "vendor.js",
@@ -14,11 +17,5 @@
         "source/googlemusic/googlemusic.js"
       ]
     }
-  ],
-
-  "permissions": {
-    "origins": [
-      "*://play.google.com/music/*"
-    ]
-  }
+  ]
 }
