@@ -1,14 +1,16 @@
 {
   "name": "Google Play Music",
-  "version": "0.1.0",
-
+  "version": "0.2.0",
   "content_scripts": [
     {
       "id": "source.googlemusic/main",
       "conditions": [
         {
           "pattern": "*://play.google.com/music/*",
-          "pageUrl": {"hostEquals": "play.google.com", "pathPrefix": "/music"}
+          "pageUrl": {
+            "hostEquals": "play.google.com",
+            "pathPrefix": "/music"
+          }
         }
       ],
       "js": [
