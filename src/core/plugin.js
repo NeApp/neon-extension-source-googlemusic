@@ -5,7 +5,7 @@ import Manifest from '../../manifest.json';
 
 export class GoogleMusicPlugin extends SourcePlugin {
     constructor() {
-        super('googlemusic', 'Google Music', Manifest);
+        super('googlemusic', Manifest);
     }
 }
 
