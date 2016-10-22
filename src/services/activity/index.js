@@ -1,27 +1,24 @@
-import ActivityService from 'eon.extension.framework/services/source/activity';
-import Registry from 'eon.extension.framework/core/registry';
+import ActivityService, {ActivityEngine} from 'eon.extension.framework/services/source/activity';
+import {Identifier, KeyType} from 'eon.extension.framework/models/activity/identifier';
 import MessagingBus from 'eon.extension.framework/messaging/bus';
-import Session, {SessionState} from 'eon.extension.framework/models/activity/session';
+import Registry from 'eon.extension.framework/core/registry';
 import {Track, Album, Artist} from 'eon.extension.framework/models/metadata/music';
 
 import Plugin from '../../core/plugin';
-
 import PlayerAPI from './player-api';
-
-const PROGRESS_EVENT_INTERVAL = 5000;  // (in milliseconds)
 
 
 export class GoogleMusicActivityService extends ActivityService {
     constructor() {
         super(Plugin);
 
-        this.api = null;
-        this.observer = null;
+        this.bus = null;
+        this.engine = null;
 
-        this.session = null;
-        this.track = null;
+        this._api = null;
+        this._observer = null;
 
-        this._nextSessionKey = 0;
+        this._currentTrack = null;
     }
 
     initialize() {
@@ -30,6 +27,12 @@ export class GoogleMusicActivityService extends ActivityService {
         // Construct messaging bus
         this.bus = new MessagingBus(Plugin.id + ':activity');
         this.bus.connect('eon.extension.core:scrobble');
+
+        // Construct activity engine
+        this.engine = new ActivityEngine(this.plugin, this.bus, {
+            getMetadata: this._getMetadata.bind(this),
+            isEnabled: () => true
+        });
 
         // Bind to document
         this.bind();
@@ -46,20 +49,20 @@ export class GoogleMusicActivityService extends ActivityService {
         }
 
         // Construct player api client
-        this.api = new PlayerAPI(document);
+        this._api = new PlayerAPI(document);
 
         // Construct mutation observer
-        this.observer = new MutationObserver((mutations) => {
+        this._observer = new MutationObserver((mutations) => {
             this._onMutations(mutations);
         });
 
         // Listen for player song info changes
-        this.observer.observe($playerSongInfo, {
+        this._observer.observe($playerSongInfo, {
             childList: true
         });
     }
 
-    getTrackDuration() {
+    _getTrackDuration() {
         let $node = document.querySelector('#material-player-progress');
 
         if($node === null) {
@@ -70,67 +73,18 @@ export class GoogleMusicActivityService extends ActivityService {
         return parseInt($node.getAttribute('aria-valuemax'), 10);
     }
 
-    read(sessionKey) {
-        this.api.getCurrentTime().then((time) => {
-            // Update activity state
-            let state = this.session.state;
-
-            if(this.session.time !== null) {
-                if(time > this.session.time) {
-                    state = SessionState.playing;
-                } else if(time <= this.session.time) {
-                    state = SessionState.paused;
-                }
-            }
-
-            // Add new sample
-            this.session.samples.push(time);
-
-            // Emit event
-            if(this.session.state !== state) {
-                let previous = this.session.state;
-
-                this.session.state = state;
-
-                // Emit state change
-                this._onStateChanged(previous, state);
-            } else if(this.session.state === SessionState.playing && this.session.time !== null) {
-                this.session.state = state;
-
-                // Emit progress
-                this.bus.emit('activity.progress', this.session.dump());
-            }
-
-            // Check if session is still active
-            if(sessionKey !== this.session.key) {
-                return;
-            }
-
-            // Queue next read
-            setTimeout(() => {
-                this.read(sessionKey);
-            }, PROGRESS_EVENT_INTERVAL);
-        });
+    _getMetadata(identifier) {
+        return this._currentTrack;
     }
 
-    _onStateChanged(previous, current) {
-        if(this.session === null) {
-            return;
-        }
+    _read() {
+        this._api.getCurrentTime().then((time) => {
+            // Update session progress
+            this.engine.progress(time, this._currentTrack.duration);
 
-        // Determine event from state change
-        let event = null;
-
-        if((previous === SessionState.null || previous === SessionState.paused) && current === SessionState.playing) {
-            event = 'activity.started';
-        } else if(current === SessionState.paused) {
-            event = 'activity.paused';
-        } else {
-            return;
-        }
-
-        // Emit event
-        this.bus.emit(event, this.session.dump());
+            // Queue next read
+            setTimeout(() => this._read(), this.engine.options.progressInterval);
+        });
     }
 
     _onMutations(mutations) {
@@ -175,50 +129,31 @@ export class GoogleMusicActivityService extends ActivityService {
         }
 
         // Build track object
-        let track = this._constructTrack(
-            $track,
-            $album,
-            $artist
-        );
+        let track = this._constructTrack($track, $album, $artist);
 
         // Ensure song has changed
-        if(this.track !== null && this.track.matches(track)) {
+        if(this._currentTrack !== null && this._currentTrack.matches(track)) {
             return;
         }
 
-        this.track = track;
+        // Update state
+        this._currentTrack = track;
 
-        // Trigger song changed callback
-        this._onTrackChanged();
-    }
-
-    _onTrackChanged() {
         // Retrieve track duration
-        this.track.duration = this.getTrackDuration();
+        this._currentTrack.duration = this._getTrackDuration();
 
-        if(this.track.duration === null) {
+        if(this._currentTrack.duration === null) {
             return;
         }
 
-        // Emit "ended" event (if there is an existing session)
-        if(this.session !== null && this.session.state !== SessionState.ended) {
-            this.session.state = SessionState.ended;
-            this.bus.emit('activity.ended', this.session.dump());
-        }
+        // Create session
+        this.engine.create(new Identifier(KeyType.Generated, track.id));
 
-        // Construct new session
-        this.session = new Session(
-            this.plugin,
-            this._nextSessionKey++,
-            this.track,
-            SessionState.LOADING
-        );
+        // Start session
+        this.engine.start();
 
-        // Emit "created" event
-        this.bus.emit('activity.created', this.session.dump());
-
-        // Start watching track progress
-        this.read(this.session.key);
+        // Start reading track progress
+        this._read();
     }
 
     _constructTrack($track, $album, $artist) {
