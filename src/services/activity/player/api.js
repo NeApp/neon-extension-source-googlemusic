@@ -3,16 +3,31 @@ const RESPONSE_KEYS = [
     'time'
 ];
 
-
-export default class GoogleMusicPlayerAPI {
-    constructor(document) {
-        this.node = document.getElementById('player-api');
-
+export default class PlayerApi {
+    constructor() {
+        this._node = null;
         this._responseCallback = null;
+    }
 
-        // Bind to "playerApiReturn" events
-        this.node.addEventListener('playerApiReturn', (event) => {
-            this._onResponse(event);
+    bind(document) {
+        return new Promise((resolve, reject) => {
+            // Try find the player api element
+            this._node = document.getElementById('player-api');
+
+            if(this._node === null) {
+                reject(new Error('Unable to find the player api element'));
+                return;
+            }
+
+            // Reset state
+            this._responseCallback = null;
+
+            // Bind to "playerApiReturn" events
+            this._node.addEventListener('playerApiReturn', (event) => {
+                this._onResponse(event);
+            });
+
+            resolve();
         });
     }
 
@@ -48,7 +63,7 @@ export default class GoogleMusicPlayerAPI {
             }
 
             // Dispatch request event
-            this.node.dispatchEvent(event);
+            this._node.dispatchEvent(event);
 
             // Handle response
             if(this._hasResponse(code)) {
