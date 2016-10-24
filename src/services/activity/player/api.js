@@ -1,18 +1,36 @@
+import Log from 'eon.extension.source.googlemusic/core/logger';
+
+
 const REQUEST_TIMEOUT = 5;  // (in seconds)
 const RESPONSE_KEYS = [
     'time'
 ];
 
-
-export default class GoogleMusicPlayerAPI {
-    constructor(document) {
-        this.node = document.getElementById('player-api');
-
+export default class PlayerApi {
+    constructor() {
+        this._node = null;
         this._responseCallback = null;
+    }
 
-        // Bind to "playerApiReturn" events
-        this.node.addEventListener('playerApiReturn', (event) => {
-            this._onResponse(event);
+    bind(document) {
+        return new Promise((resolve, reject) => {
+            // Try find the player api element
+            this._node = document.getElementById('player-api');
+
+            if(this._node === null) {
+                reject(new Error('Unable to find the player api element'));
+                return;
+            }
+
+            // Reset state
+            this._responseCallback = null;
+
+            // Bind to "playerApiReturn" events
+            this._node.addEventListener('playerApiReturn', (event) => {
+                this._onResponse(event);
+            });
+
+            resolve();
         });
     }
 
@@ -48,7 +66,7 @@ export default class GoogleMusicPlayerAPI {
             }
 
             // Dispatch request event
-            this.node.dispatchEvent(event);
+            this._node.dispatchEvent(event);
 
             // Handle response
             if(this._hasResponse(code)) {
@@ -75,7 +93,7 @@ export default class GoogleMusicPlayerAPI {
         let response = event.detail;
 
         if(response == null) {
-            console.warn('Invalid response returned:', response);
+            Log.warn('Invalid response returned:', response);
             return;
         }
 
@@ -93,7 +111,7 @@ export default class GoogleMusicPlayerAPI {
         }
 
         if(code === null) {
-            console.warn('Unable to find response code in response object:', response);
+            Log.warn('Unable to find response code in response object:', response);
             return;
         }
 
@@ -109,6 +127,6 @@ export default class GoogleMusicPlayerAPI {
             return;
         }
 
-        console.warn('Unknown response returned:', response);
+        Log.warn('Unknown response returned:', response);
     }
 }
