@@ -1,3 +1,5 @@
+import merge from 'lodash-es/merge';
+
 import Log from 'eon.extension.source.googlemusic/core/logger';
 
 
