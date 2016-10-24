@@ -1,13 +1,18 @@
 import Log from 'eon.extension.source.googlemusic/core/logger';
 
 
-const REQUEST_TIMEOUT = 5;  // (in seconds)
-const RESPONSE_KEYS = [
+const ResponseKeys = [
     'time'
 ];
 
 export default class PlayerApi {
-    constructor() {
+    constructor(options) {
+        // Parse options
+        this.options = merge({
+            requestTimeout: 5000
+        }, options);
+
+        // Private attributes
         this._node = null;
         this._responseCallback = null;
     }
@@ -71,9 +76,9 @@ export default class PlayerApi {
             // Handle response
             if(this._hasResponse(code)) {
                 // Reject promise if no response is returned within 5 seconds
-                timeout = setTimeout(function() {
-                    reject('No response returned within ' + REQUEST_TIMEOUT + ' second(s)');
-                }, REQUEST_TIMEOUT * 1000);
+                timeout = setTimeout(() => {
+                    reject('No response returned within ' + this.options.requestTimeout + ' second(s)');
+                }, this.options.requestTimeout);
             } else {
                 // No response expected, resolve promise
                 resolve();
@@ -105,7 +110,7 @@ export default class PlayerApi {
                 continue;
             }
 
-            if(RESPONSE_KEYS.indexOf(key) === -1 && typeof response[key] === 'number') {
+            if(ResponseKeys.indexOf(key) === -1 && typeof response[key] === 'number') {
                 code = response[key];
             }
         }
