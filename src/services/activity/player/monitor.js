@@ -4,6 +4,7 @@ import {KeyType, ArtistIdentifier, AlbumIdentifier, TrackIdentifier} from 'eon.e
 import EventEmitter from 'eventemitter3';
 import merge from 'lodash-es/merge';
 
+import Log from 'eon.extension.source.googlemusic/core/logger';
 import PlayerApi from './api';
 import PlayerObserver from './observer';
 
@@ -41,7 +42,7 @@ export default class PlayerMonitor extends EventEmitter {
         let identifier = this._constructIdentifier($artist, $album, $track);
 
         if(!isDefined(identifier)) {
-            console.error('Unable to construct track identifier');
+            Log.warn('Unable to construct track identifier');
             return false;
         }
 
@@ -97,7 +98,7 @@ export default class PlayerMonitor extends EventEmitter {
         let $node = document.querySelector('#material-player-progress');
 
         if($node === null) {
-            console.error('Unable to find "#material-player-progress" element');
+            Log.warn('Unable to find "#material-player-progress" element');
             return null;
         }
 

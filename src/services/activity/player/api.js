@@ -1,3 +1,6 @@
+import Log from 'eon.extension.source.googlemusic/core/logger';
+
+
 const REQUEST_TIMEOUT = 5;  // (in seconds)
 const RESPONSE_KEYS = [
     'time'
@@ -90,7 +93,7 @@ export default class PlayerApi {
         let response = event.detail;
 
         if(response == null) {
-            console.warn('Invalid response returned:', response);
+            Log.warn('Invalid response returned:', response);
             return;
         }
 
@@ -108,7 +111,7 @@ export default class PlayerApi {
         }
 
         if(code === null) {
-            console.warn('Unable to find response code in response object:', response);
+            Log.warn('Unable to find response code in response object:', response);
             return;
         }
 
@@ -124,6 +127,6 @@ export default class PlayerApi {
             return;
         }
 
-        console.warn('Unknown response returned:', response);
+        Log.warn('Unknown response returned:', response);
     }
 }

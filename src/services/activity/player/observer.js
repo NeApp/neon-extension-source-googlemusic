@@ -1,6 +1,8 @@
 import EventEmitter from 'eventemitter3';
 import merge from 'lodash-es/merge';
 
+import Log from 'eon.extension.source.googlemusic/core/logger';
+
 
 export default class PlayerObserver extends EventEmitter {
     bind(document, options) {
@@ -29,7 +31,7 @@ export default class PlayerObserver extends EventEmitter {
                     attempts++;
 
                     // Attempt another bind in `options.interval` milliseconds
-                    console.info('Unable to find the "#playerSongInfo" element, will try again in 500ms');
+                    Log.info('Unable to find the "#playerSongInfo" element, will try again in 500ms');
                     setTimeout(attemptBind, options.interval);
                     return;
                 }
@@ -73,7 +75,7 @@ export default class PlayerObserver extends EventEmitter {
         let $track = node.querySelector('#currently-playing-title');
 
         if($track === null) {
-            console.error('Unable to find "#currently-playing-title" element');
+            Log.warn('Unable to find "#currently-playing-title" element');
             return;
         }
 
@@ -81,7 +83,7 @@ export default class PlayerObserver extends EventEmitter {
         let $album = node.querySelector('.player-album');
 
         if($album === null) {
-            console.error('Unable to find ".player-album" element');
+            Log.warn('Unable to find ".player-album" element');
             return;
         }
 
@@ -89,7 +91,7 @@ export default class PlayerObserver extends EventEmitter {
         let $artist = node.querySelector('.player-artist');
 
         if($artist === null) {
-            console.error('Unable to find ".player-artist" element');
+            Log.warn('Unable to find ".player-artist" element');
             return;
         }
 

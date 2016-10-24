@@ -3,7 +3,8 @@ import MessagingBus from 'eon.extension.framework/messaging/bus';
 import Registry from 'eon.extension.framework/core/registry';
 import {Artist, Album, Track} from 'eon.extension.framework/models/music';
 
-import Plugin from '../../core/plugin';
+import Log from 'eon.extension.source.googlemusic/core/logger';
+import Plugin from 'eon.extension.source.googlemusic/core/plugin';
 import PlayerMonitor from './player/monitor';
 
 
@@ -78,7 +79,7 @@ export class GoogleMusicActivityService extends ActivityService {
         let $node = document.querySelector('#material-player-progress');
 
         if($node === null) {
-            console.error('Unable to find "#material-player-progress" element');
+            Log.warn('Unable to find "#material-player-progress" element');
             return null;
         }
 
