@@ -47,32 +47,27 @@ export class GoogleMusicActivityService extends ActivityService {
 
     _getMetadata(identifier) {
         // Construct artist
-        let artist = new Artist(
-            this.plugin,
-            identifier.artist.key,
-            identifier.artist.title
-        );
+        let artist = Artist.create(this.plugin, identifier.artist.key, {
+            title: identifier.artist.title
+        });
 
         // Construct album
-        let album = new Album(
-            this.plugin,
-            identifier.album.key,
-            identifier.album.title,
+        let album = Album.create(this.plugin, identifier.album.key, {
+            title: identifier.album.title,
 
-            artist
-        );
+            // Children
+            artist: artist
+        });
 
         // Construct track
-        return new Track(
-            this.plugin,
-            identifier.key,
-            identifier.title,
+        return Track.create(this.plugin, identifier.key, {
+            title: identifier.title,
+            duration: this._getTrackDuration(),
 
-            artist,
-            album,
-
-            this._getTrackDuration()
-        );
+            // Children
+            artist: artist,
+            album: album
+        });
     }
 
     _getTrackDuration() {
