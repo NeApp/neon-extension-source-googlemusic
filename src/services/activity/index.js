@@ -3,6 +3,8 @@ import MessagingBus from 'eon.extension.framework/messaging/bus';
 import Registry from 'eon.extension.framework/core/registry';
 import {Artist, Album, Track} from 'eon.extension.framework/models/music';
 
+import uuid from 'uuid';
+
 import Log from 'eon.extension.source.googlemusic/core/logger';
 import Plugin from 'eon.extension.source.googlemusic/core/plugin';
 import PlayerMonitor from './player/monitor';
@@ -21,7 +23,7 @@ export class GoogleMusicActivityService extends ActivityService {
         super.initialize();
 
         // Construct messaging bus
-        this.bus = new MessagingBus(Plugin.id + ':activity');
+        this.bus = new MessagingBus(Plugin.id + ':activity:' + uuid.v4());
         this.bus.connect('eon.extension.core:scrobble');
 
         // Construct activity engine
@@ -47,32 +49,27 @@ export class GoogleMusicActivityService extends ActivityService {
 
     _getMetadata(identifier) {
         // Construct artist
-        let artist = new Artist(
-            this.plugin,
-            identifier.artist.key,
-            identifier.artist.title
-        );
+        let artist = Artist.create(this.plugin, identifier.artist.key, {
+            title: identifier.artist.title
+        });
 
         // Construct album
-        let album = new Album(
-            this.plugin,
-            identifier.album.key,
-            identifier.album.title,
+        let album = Album.create(this.plugin, identifier.album.key, {
+            title: identifier.album.title,
 
-            artist
-        );
+            // Children
+            artist: artist
+        });
 
         // Construct track
-        return new Track(
-            this.plugin,
-            identifier.key,
-            identifier.title,
+        return Track.create(this.plugin, identifier.key, {
+            title: identifier.title,
+            duration: this._getTrackDuration(),
 
-            artist,
-            album,
-
-            this._getTrackDuration()
-        );
+            // Children
+            artist: artist,
+            album: album
+        });
     }
 
     _getTrackDuration() {
