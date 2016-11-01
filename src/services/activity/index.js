@@ -3,6 +3,8 @@ import MessagingBus from 'eon.extension.framework/messaging/bus';
 import Registry from 'eon.extension.framework/core/registry';
 import {Artist, Album, Track} from 'eon.extension.framework/models/music';
 
+import uuid from 'uuid';
+
 import Log from 'eon.extension.source.googlemusic/core/logger';
 import Plugin from 'eon.extension.source.googlemusic/core/plugin';
 import PlayerMonitor from './player/monitor';
@@ -21,7 +23,7 @@ export class GoogleMusicActivityService extends ActivityService {
         super.initialize();
 
         // Construct messaging bus
-        this.bus = new MessagingBus(Plugin.id + ':activity');
+        this.bus = new MessagingBus(Plugin.id + ':activity:' + uuid.v4());
         this.bus.connect('eon.extension.core:scrobble');
 
         // Construct activity engine
