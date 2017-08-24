@@ -28,7 +28,9 @@ export class GoogleMusicActivityService extends ActivityService {
 
         // Construct activity engine
         this.engine = new ActivityEngine(this.plugin, this.bus, {
+            getDuration: this._getDuration.bind(this),
             getMetadata: this._getMetadata.bind(this),
+
             isEnabled: () => true
         });
 
@@ -64,7 +66,7 @@ export class GoogleMusicActivityService extends ActivityService {
         // Construct track
         return Track.create(this.plugin, identifier.key, {
             title: identifier.title,
-            duration: this._getTrackDuration(),
+            duration: this._getDuration(),
 
             // Children
             artist: artist,
@@ -72,7 +74,7 @@ export class GoogleMusicActivityService extends ActivityService {
         });
     }
 
-    _getTrackDuration() {
+    _getDuration() {
         let $node = document.querySelector('#material-player-progress');
 
         if($node === null) {
