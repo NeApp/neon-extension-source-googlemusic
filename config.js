@@ -1,4 +1,7 @@
 module.exports = {
+    children: [
+        'shim'
+    ],
     services: [
         'configuration',
         'migrate',

@@ -19,5 +19,8 @@
         "source/googlemusic/googlemusic.js"
       ]
     }
+  ],
+  "web_accessible_resources": [
+    "source/googlemusic/shim/shim.js"
   ]
 }

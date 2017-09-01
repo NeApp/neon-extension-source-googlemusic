@@ -10,5 +10,8 @@
     "babel-preset-react": "^6.16.0",
     "eslint": "^3.7.0",
     "eslint-plugin-react": "^6.3.0"
+  },
+  "dependencies": {
+    "js-cookie": "^2.1.4"
   }
 }
