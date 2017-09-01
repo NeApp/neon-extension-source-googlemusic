@@ -1,6 +1,6 @@
 {
   "name": "Google Play Music",
-  "version": "0.3.3",
+  "version": "1.0.0-beta",
   "content_scripts": [
     {
       "id": "source.googlemusic/main",
