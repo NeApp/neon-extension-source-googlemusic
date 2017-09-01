@@ -1,3 +1,5 @@
+import {isDefined} from 'eon.extension.framework/core/helpers';
+
 import EventEmitter from 'eventemitter3';
 import merge from 'lodash-es/merge';
 
@@ -5,6 +7,12 @@ import Log from 'eon.extension.source.googlemusic/core/logger';
 
 
 export default class PlayerObserver extends EventEmitter {
+    constructor() {
+        super();
+
+        this.$playerSongInfo = null;
+    }
+
     bind(document, options) {
         // Set default options
         options = merge({
@@ -18,9 +26,9 @@ export default class PlayerObserver extends EventEmitter {
 
             let attemptBind = () => {
                 // Find "#playerSongInfo" element
-                let $playerSongInfo = document.querySelector('#playerSongInfo');
+                this.$playerSongInfo = document.querySelector('#playerSongInfo');
 
-                if($playerSongInfo === null) {
+                if(this.$playerSongInfo === null) {
                     // Check if `options.timeout` has been reached
                     if(attempts * options.interval > options.timeout) {
                         reject(new Error('Unable to find song information element'));
@@ -42,7 +50,9 @@ export default class PlayerObserver extends EventEmitter {
                 });
 
                 // Listen for player song info changes
-                this._observer.observe($playerSongInfo, {
+                this._observer.observe(this.$playerSongInfo, {
+                    attributeFilter: ['style'],
+                    attributeOldValue: true,
                     childList: true
                 });
 
@@ -61,6 +71,7 @@ export default class PlayerObserver extends EventEmitter {
     }
 
     _onMutation(mutation) {
+        // Process added nodes
         for(let i = 0; i < mutation.addedNodes.length; ++i) {
             let node = mutation.addedNodes[i];
 
@@ -68,34 +79,33 @@ export default class PlayerObserver extends EventEmitter {
                 this._onPlayingInfoChanged(node);
             }
         }
+
+        // Process attribute changed
+        if(mutation.target.id === 'playerSongInfo' && mutation.attributeName === 'style') {
+            this._onPlayingStyleChanged(mutation.oldValue, this.$playerSongInfo.attributes.style.value);
+        }
+    }
+
+    _onPlayingStyleChanged(previous, current) {
+        if(this._isHidden(previous) && !this._isHidden(current)) {
+            this.emit('queue.created');
+        }
+
+        if(!this._isHidden(previous) && this._isHidden(current)) {
+            this.emit('queue.destroyed');
+        }
     }
 
     _onPlayingInfoChanged(node) {
-        // Retrieve elements
-        let $track = node.querySelector('#currently-playing-title');
-
-        if($track === null) {
-            Log.warn('Unable to find "#currently-playing-title" element');
-            return;
-        }
-
-        // Find album title element
-        let $album = node.querySelector('.player-album');
-
-        if($album === null) {
-            Log.warn('Unable to find ".player-album" element');
-            return;
-        }
-
-        // Find artist title element
-        let $artist = node.querySelector('.player-artist');
-
-        if($artist === null) {
-            Log.warn('Unable to find ".player-artist" element');
-            return;
-        }
-
         // Emit "changed" event
-        this.emit('changed', $artist, $album, $track);
+        this.emit('track.changed',
+            node.querySelector('.player-artist'),
+            node.querySelector('.player-album'),
+            node.querySelector('#currently-playing-title')
+        );
+    }
+
+    _isHidden(style) {
+        return isDefined(style) && style.indexOf('display: none') >= 0;
     }
 }

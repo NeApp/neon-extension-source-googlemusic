@@ -1,14 +1,22 @@
 import ActivityService, {ActivityEngine} from 'eon.extension.framework/services/source/activity';
 import MessagingBus from 'eon.extension.framework/messaging/bus';
 import Registry from 'eon.extension.framework/core/registry';
-import {Artist, Album, Track} from 'eon.extension.framework/models/music';
+import {Artist} from 'eon.extension.framework/models/item/music';
+import {isDefined} from 'eon.extension.framework/core/helpers';
 
-import uuid from 'uuid';
+import Find from 'lodash-es/find';
+import Uuid from 'uuid';
+import {Cache} from 'memory-cache';
 
+import MetadataApi from 'eon.extension.source.googlemusic/api/metadata';
+import ShimApi from 'eon.extension.source.googlemusic/api/shim';
 import Log from 'eon.extension.source.googlemusic/core/logger';
 import Plugin from 'eon.extension.source.googlemusic/core/plugin';
 import PlayerMonitor from './player/monitor';
+import {encodeTitle} from 'eon.extension.source.googlemusic/core/helpers';
 
+
+const AlbumCacheExpiry = 3 * 60 * 60 * 1000;  // 3 hours
 
 export class GoogleMusicActivityService extends ActivityService {
     constructor() {
@@ -17,19 +25,20 @@ export class GoogleMusicActivityService extends ActivityService {
         this.bus = null;
         this.engine = null;
         this.monitor = null;
+
+        this.albums = new Cache();
     }
 
     initialize() {
         super.initialize();
 
         // Construct messaging bus
-        this.bus = new MessagingBus(Plugin.id + ':activity:' + uuid.v4());
+        this.bus = new MessagingBus(Plugin.id + ':activity:' + Uuid.v4());
         this.bus.connect('eon.extension.core:scrobble');
 
         // Construct activity engine
         this.engine = new ActivityEngine(this.plugin, this.bus, {
-            getDuration: this._getDuration.bind(this),
-            getMetadata: this._getMetadata.bind(this),
+            fetchMetadata: this.fetchMetadata.bind(this),
 
             isEnabled: () => true
         });
@@ -46,43 +55,90 @@ export class GoogleMusicActivityService extends ActivityService {
         this.engine.bind(this.monitor);
 
         // Bind player monitor to page
-        return this.monitor.bind(document);
+        return ShimApi.inject()
+            .then((configuration) => {
+                Log.debug('Configuration received: %o', configuration);
+
+                // Initialize API clients
+                MetadataApi.initialize(configuration);
+
+                // Bind player monitor to page
+                return this.monitor.bind(document);
+            })
+            .catch((err) => {
+                Log.error('Unable to inject shim: %s', err.message, err);
+            });
     }
 
-    _getMetadata(identifier) {
-        // Construct artist
-        let artist = Artist.create(this.plugin, identifier.artist.key, {
-            title: identifier.artist.title
-        });
+    fetchMetadata(item) {
+        let albumId = item.album.ids['googlemusic'].id;
 
-        // Construct album
-        let album = Album.create(this.plugin, identifier.album.key, {
-            title: identifier.album.title,
-
-            // Children
-            artist: artist
-        });
-
-        // Construct track
-        return Track.create(this.plugin, identifier.key, {
-            title: identifier.title,
-            duration: this._getDuration(),
-
-            // Children
-            artist: artist,
-            album: album
-        });
-    }
-
-    _getDuration() {
-        let $node = document.querySelector('#material-player-progress');
-
-        if($node === null) {
-            Log.warn('Unable to find "#material-player-progress" element');
-            return null;
+        // Ensure album identifier is available
+        if(!isDefined(albumId)) {
+            return false;
         }
 
-        return parseInt($node.getAttribute('aria-valuemax'), 10);
+        // Fetch album metadata
+        return this.fetchAlbum(albumId).then((album) => {
+            // Create album artist
+            item.album.artist = Artist.create({
+                title: album.artistTitle,
+
+                ids: {
+                    googlemusic: {
+                        id: album.artistId,
+                        path: album.artistId + '/' + encodeTitle(album.artistTitle)
+                    }
+                }
+            });
+
+            // Encode item title (for track matching)
+            let itemTitleEncoded = encodeTitle(item.title);
+
+            // Find matching track
+            let track = Find(album.tracks, (track) => encodeTitle(track.title) === itemTitleEncoded);
+
+            if(!isDefined(track)) {
+                Log.warn('Unable to find item %o (%o) in album %o', item, itemTitleEncoded, album);
+                return false;
+            }
+
+            // Determine if the item is being changed
+            let changed = (
+                item.number !== track.number ||
+                item.duration !== track.duration ||
+                item.ids.googlemusic.id !== track.id
+            );
+
+            // Update item
+            item.number = track.number;
+            item.duration = track.duration;
+
+            item.ids.googlemusic.id = track.id;
+
+            item.changed = changed;
+            return true;
+        }, (err) => {
+            Log.warn('Unable to fetch album', err);
+            return false;
+        });
+    }
+
+    fetchAlbum(albumId) {
+        let album = this.albums.get(albumId);
+
+        if(isDefined(album)) {
+            return Promise.resolve(album);
+        }
+
+        // Fetch album
+        return MetadataApi.fetchAlbum(albumId).then((album) => {
+            // Store album in cache (which is automatically removed in `AlbumCacheExpiry`)
+            this.albums.put(albumId, album, AlbumCacheExpiry);
+
+            // Return album
+            return album;
+        });
     }
 }
 

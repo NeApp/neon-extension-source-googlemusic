@@ -1,5 +1,5 @@
+import {Artist, Album, Track} from 'eon.extension.framework/models/item/music';
 import {isDefined} from 'eon.extension.framework/core/helpers';
-import {KeyType, ArtistIdentifier, AlbumIdentifier, TrackIdentifier} from 'eon.extension.framework/models/music';
 
 import EventEmitter from 'eventemitter3';
 import merge from 'lodash-es/merge';
@@ -7,6 +7,7 @@ import merge from 'lodash-es/merge';
 import Log from 'eon.extension.source.googlemusic/core/logger';
 import PlayerApi from './api';
 import PlayerObserver from './observer';
+import {encodeTitle} from 'eon.extension.source.googlemusic/core/helpers';
 
 
 export default class PlayerMonitor extends EventEmitter {
@@ -23,11 +24,13 @@ export default class PlayerMonitor extends EventEmitter {
 
         // Construct observer
         this.observer = new PlayerObserver();
-        this.observer.on('changed', this._onTrackChanged.bind(this));
+        this.observer.on('queue.created', this._onQueueCreated.bind(this));
+        this.observer.on('queue.destroyed', this._onQueueDestroyed.bind(this));
+        this.observer.on('track.changed', this._onTrackChanged.bind(this));
 
         // Private attributes
-        this._currentIdentifier = null;
-        this._readingProgress = false;
+        this._currentTrack = null;
+        this._progressEmitterEnabled = false;
     }
 
     bind(document) {
@@ -38,97 +41,145 @@ export default class PlayerMonitor extends EventEmitter {
     // region Event handlers
 
     _onTrackChanged($artist, $album, $track) {
-        // Construct identifier
-        let identifier = this._constructIdentifier($artist, $album, $track);
+        // Try construct track
+        let track;
 
-        if(!isDefined(identifier)) {
-            Log.warn('Unable to construct track identifier');
-            return false;
+        try {
+            track = this._constructTrack($artist, $album, $track);
+        } catch(e) {
+            Log.error('Unable to construct track: %s', e.message, e);
+            return;
         }
 
-        if(isDefined(this._currentIdentifier) && this._currentIdentifier.matches(identifier)) {
-            return false;
+        if(!isDefined(track)) {
+            this._currentTrack = null;
+            return;
+        }
+
+        if(isDefined(this._currentTrack) && this._currentTrack.matches(track)) {
+            return;
         }
 
         // Update current identifier
-        this._currentIdentifier = identifier;
+        this._currentTrack = track;
 
         // Emit "created" event
-        this.emit('created', identifier);
+        this.emit('created', track);
+    }
 
-        // Start reading track progress
-        this._startReadingProgress();
-        return true;
+    _onQueueCreated() {
+        Log.debug('Queue created');
+
+        // Start progress emitter
+        this._startProgressEmitter();
+    }
+
+    _onQueueDestroyed() {
+        Log.debug('Queue destroyed');
+
+        // Stop progress emitter
+        this._progressEmitterEnabled = false;
+
+        // Emit "stopped" event
+        this.emit('stopped');
     }
 
     // endregion
 
     // region Private methods
 
-    _constructIdentifier($artist, $album, $track) {
-        // Retrieve parameters
-        let artistId = $artist.getAttribute('data-id');
-        let albumId = $album.getAttribute('data-id');
-
-        // Generate track key
-        let trackId = albumId + '/' + encodeURIComponent($track.innerText).replace(/%20/g, '+');
-
-        // Construct track identifier
-        return new TrackIdentifier(
-            KeyType.Generated, trackId,
-
-            // Artist
-            new ArtistIdentifier(
-                KeyType.Exact, artistId,
-                $artist.innerText
-            ),
-
-            // Album
-            new AlbumIdentifier(
-                KeyType.Exact, albumId,
-                $album.innerText
-            ),
-
-            // Track title
-            $track.innerText
-        );
-    }
-
-    _getTrackDuration() {
-        let $node = document.querySelector('#material-player-progress');
-
-        if($node === null) {
-            Log.warn('Unable to find "#material-player-progress" element');
+    _constructTrack($artist, $album, $track) {
+        if(!isDefined($artist) || !isDefined($album) || !isDefined($track)) {
             return null;
         }
 
-        return parseInt($node.getAttribute('aria-valuemax'), 10);
+        // Retrieve paths
+        let artistId = $artist.getAttribute('data-id');
+        let albumId = $album.getAttribute('data-id');
+
+        // Generate track path
+        let trackId = albumId + '/' + encodeTitle($track.innerText);
+
+        // Construct artist
+        let artist = Artist.create({
+            title: $artist.innerText,
+
+            ids: {
+                googlemusic: {
+                    id: this._getId(artistId),
+                    path: artistId
+                }
+            }
+        });
+
+        // Construct album
+        let album = Album.create({
+            title: $album.innerText,
+
+            ids: {
+                googlemusic: {
+                    id: this._getId(albumId),
+                    path: albumId
+                }
+            }
+        });
+
+        // Construct track
+        return Track.create({
+            title: $track.innerText,
+
+            artist: artist,
+            album: album,
+
+            ids: {
+                googlemusic: {
+                    path: trackId
+                }
+            }
+        });
     }
 
-    _startReadingProgress() {
-        if(this._readingProgress) {
-            // Already reading track progress
+    _getId(value) {
+        if(!isDefined(value)) {
+            return null;
+        }
+
+        // Find first "/" character
+        let end = value.indexOf('/');
+
+        if(end < 0) {
+            return value;
+        }
+
+        return value.substring(0, end);
+    }
+
+    _startProgressEmitter() {
+        if(this._progressEmitterEnabled) {
             return;
         }
 
-        // Set reading state
-        this._readingProgress = true;
+        this._progressEmitterEnabled = true;
 
-        // Construct read callback
+        // Construct read method
         let get = () => {
-            // TODO stop reading progress?
+            if(!this._progressEmitterEnabled) {
+                Log.debug('Stopped progress emitter');
+                return;
+            }
 
             // Read track position
             this.api.getCurrentTime().then((time) => {
-                // Update session progress
-                this.emit('progress', time, this._getTrackDuration());
+                // Emit "progress" event
+                this.emit('progress', time);
 
                 // Queue next read
                 setTimeout(get, this.options.progressInterval);
             });
         };
 
-        // Start reading track position
+        // Start reading track progress
+        Log.debug('Started progress emitter');
         get();
     }
 
