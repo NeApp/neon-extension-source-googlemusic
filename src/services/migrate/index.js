@@ -14,9 +14,8 @@ export class GoogleMusicMigrateService extends MigrateService {
     onPreferences(preferences) {
         Log.info('Migrating preferences...');
 
-        // Enable plugin (request permissions, and register content scripts)
-        return Plugin.requestPermissions()
-            .then(() => Plugin.registerContentScripts())
+        // Enable plugin
+        return Plugin.registerContentScripts()
             .then(() => Preferences.putBoolean(Plugin.id + ':enabled', true));
     }
 }
