@@ -12,6 +12,7 @@
     "eslint-plugin-react": "^6.3.0"
   },
   "dependencies": {
-    "js-cookie": "^2.1.4"
+    "js-cookie": "^2.1.4",
+    "urijs": "^1.18.12"
   }
 }
