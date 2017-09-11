@@ -1,11 +1,9 @@
 import ActivityService, {ActivityEngine} from 'eon.extension.framework/services/source/activity';
-import MessagingBus from 'eon.extension.framework/messaging/bus';
 import Registry from 'eon.extension.framework/core/registry';
 import {Artist} from 'eon.extension.framework/models/item/music';
 import {isDefined} from 'eon.extension.framework/core/helpers';
 
 import Find from 'lodash-es/find';
-import Uuid from 'uuid';
 import {Cache} from 'memory-cache';
 
 import MetadataApi from 'eon.extension.source.googlemusic/api/metadata';
@@ -22,7 +20,7 @@ export class GoogleMusicActivityService extends ActivityService {
     constructor() {
         super(Plugin);
 
-        this.bus = null;
+        this.messaging = null;
         this.engine = null;
         this.monitor = null;
 
@@ -32,12 +30,11 @@ export class GoogleMusicActivityService extends ActivityService {
     initialize() {
         super.initialize();
 
-        // Construct messaging bus
-        this.bus = new MessagingBus(Plugin.id + ':activity:' + Uuid.v4());
-        this.bus.connect('eon.extension.core:scrobble');
+        // Construct messaging service
+        this.messaging = Plugin.messaging.service('activity');
 
         // Construct activity engine
-        this.engine = new ActivityEngine(this.plugin, this.bus, {
+        this.engine = new ActivityEngine(this.plugin, this.messaging, {
             fetchMetadata: this.fetchMetadata.bind(this),
 
             isEnabled: () => true
