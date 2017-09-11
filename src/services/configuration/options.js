@@ -13,9 +13,7 @@ export default [
         new EnableOption(Plugin, 'enabled', 'Enabled', {
             default: false,
 
-            type: 'plugin',
-            permissions: true,
-            contentScripts: true
+            type: 'plugin'
         }),
 
         new Group(Plugin, 'debugging', 'Debugging', [
