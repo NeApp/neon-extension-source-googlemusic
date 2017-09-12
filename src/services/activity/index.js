@@ -20,7 +20,6 @@ export class GoogleMusicActivityService extends ActivityService {
     constructor() {
         super(Plugin);
 
-        this.messaging = null;
         this.engine = null;
         this.monitor = null;
 
@@ -30,11 +29,8 @@ export class GoogleMusicActivityService extends ActivityService {
     initialize() {
         super.initialize();
 
-        // Construct messaging service
-        this.messaging = Plugin.messaging.service('activity');
-
         // Construct activity engine
-        this.engine = new ActivityEngine(this.plugin, this.messaging, {
+        this.engine = new ActivityEngine(this.plugin, {
             fetchMetadata: this.fetchMetadata.bind(this),
 
             isEnabled: () => true
