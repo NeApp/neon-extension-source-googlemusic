@@ -11,7 +11,7 @@ import ShimApi from 'eon.extension.source.googlemusic/api/shim';
 import Log from 'eon.extension.source.googlemusic/core/logger';
 import Plugin from 'eon.extension.source.googlemusic/core/plugin';
 import PlayerMonitor from './player/monitor';
-import {encodeTitle} from 'eon.extension.source.googlemusic/core/helpers';
+import {cleanTitle, encodeTitle} from 'eon.extension.source.googlemusic/core/helpers';
 
 
 const AlbumCacheExpiry = 3 * 60 * 60 * 1000;  // 3 hours
@@ -85,14 +85,14 @@ export class GoogleMusicActivityService extends ActivityService {
                 }
             });
 
-            // Encode item title (for track matching)
-            let itemTitleEncoded = encodeTitle(item.title);
+            // Clean item title (for matching)
+            let title = cleanTitle(item.title);
 
             // Find matching track
-            let track = Find(album.tracks, (track) => encodeTitle(track.title) === itemTitleEncoded);
+            let track = Find(album.tracks, (track) => cleanTitle(track.title) === title);
 
             if(!isDefined(track)) {
-                Log.warn('Unable to find item %o (%o) in album %o', item, itemTitleEncoded, album);
+                Log.warn('Unable to find item %o (%o) in album %o', item, title, album);
                 return false;
             }
 
