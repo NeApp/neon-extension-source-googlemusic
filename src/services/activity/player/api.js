@@ -1,4 +1,4 @@
-import merge from 'lodash-es/merge';
+import Merge from 'lodash-es/merge';
 
 import Log from 'eon.extension.source.googlemusic/core/logger';
 
@@ -10,7 +10,7 @@ const ResponseKeys = [
 export default class PlayerApi {
     constructor(options) {
         // Parse options
-        this.options = merge({
+        this.options = Merge({
             requestTimeout: 5000
         }, options);
 

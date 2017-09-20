@@ -1,8 +1,8 @@
 /* eslint-disable no-new */
-import {isDefined} from 'eon.extension.framework/core/helpers';
-
 import Cookie from 'js-cookie';
 import EventEmitter from 'eventemitter3';
+
+import {isDefined} from 'eon.extension.framework/core/helpers';
 
 
 export class ShimRequests extends EventEmitter {

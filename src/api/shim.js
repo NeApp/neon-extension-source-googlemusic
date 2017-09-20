@@ -1,11 +1,10 @@
-import Extension from 'eon.extension.browser/extension';
-import {isDefined} from 'eon.extension.framework/core/helpers';
-import {createScript} from 'eon.extension.framework/core/helpers/script';
-
 import EventEmitter from 'eventemitter3';
 import Merge from 'lodash-es/merge';
 
+import Extension from 'eon.extension.browser/extension';
 import Log from 'eon.extension.source.googlemusic/core/logger';
+import {isDefined} from 'eon.extension.framework/core/helpers';
+import {createScript} from 'eon.extension.framework/core/helpers/script';
 
 
 export class ShimEvents extends EventEmitter {

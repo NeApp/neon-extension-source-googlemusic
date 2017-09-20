@@ -1,9 +1,9 @@
-import {isDefined} from 'eon.extension.framework/core/helpers';
-
 import URI from 'urijs';
 
-import ShimApi from '../shim';
+import {isDefined} from 'eon.extension.framework/core/helpers';
+
 import Parser from './models';
+import ShimApi from '../shim';
 
 
 const BaseUrl = 'https://play.google.com/music/';

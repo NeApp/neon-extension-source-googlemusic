@@ -1,9 +1,8 @@
-import {isDefined} from 'eon.extension.framework/core/helpers';
-
 import EventEmitter from 'eventemitter3';
-import merge from 'lodash-es/merge';
+import Merge from 'lodash-es/merge';
 
 import Log from 'eon.extension.source.googlemusic/core/logger';
+import {isDefined} from 'eon.extension.framework/core/helpers';
 
 
 export default class PlayerObserver extends EventEmitter {
@@ -15,7 +14,7 @@ export default class PlayerObserver extends EventEmitter {
 
     bind(document, options) {
         // Set default options
-        options = merge({
+        options = Merge({
             interval: 500,
             timeout: 10 * 1000
         }, options || {});

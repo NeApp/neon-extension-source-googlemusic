@@ -1,17 +1,17 @@
-import ActivityService, {ActivityEngine} from 'eon.extension.framework/services/source/activity';
-import Registry from 'eon.extension.framework/core/registry';
-import {Artist} from 'eon.extension.framework/models/item/music';
-import {isDefined} from 'eon.extension.framework/core/helpers';
-
 import Find from 'lodash-es/find';
 import {Cache} from 'memory-cache';
 
-import MetadataApi from 'eon.extension.source.googlemusic/api/metadata';
-import ShimApi from 'eon.extension.source.googlemusic/api/shim';
+import ActivityService, {ActivityEngine} from 'eon.extension.framework/services/source/activity';
 import Log from 'eon.extension.source.googlemusic/core/logger';
+import MetadataApi from 'eon.extension.source.googlemusic/api/metadata';
 import Plugin from 'eon.extension.source.googlemusic/core/plugin';
-import PlayerMonitor from './player/monitor';
+import Registry from 'eon.extension.framework/core/registry';
+import ShimApi from 'eon.extension.source.googlemusic/api/shim';
+import {Artist} from 'eon.extension.framework/models/item/music';
+import {isDefined} from 'eon.extension.framework/core/helpers';
 import {cleanTitle, encodeTitle} from 'eon.extension.source.googlemusic/core/helpers';
+
+import PlayerMonitor from './player/monitor';
 
 
 const AlbumCacheExpiry = 3 * 60 * 60 * 1000;  // 3 hours

@@ -1,9 +1,8 @@
 import Log from 'eon.extension.framework/core/logger';
 import MigrateService from 'eon.extension.framework/services/migrate';
+import Plugin from 'eon.extension.source.googlemusic/core/plugin';
 import Preferences from 'eon.extension.framework/preferences';
 import Registry from 'eon.extension.framework/core/registry';
-
-import Plugin from 'eon.extension.source.googlemusic/core/plugin';
 
 
 export class GoogleMusicMigrateService extends MigrateService {
