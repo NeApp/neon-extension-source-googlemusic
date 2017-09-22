@@ -14,8 +14,8 @@
         }
       ],
       "js": [
-        "vendor.js",
-        "shared.js",
+        "common.js",
+        "source/common.js",
         "source/googlemusic/googlemusic.js"
       ]
     }
