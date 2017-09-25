@@ -92,7 +92,7 @@ export class GoogleMusicActivityService extends ActivityService {
             let track = Find(album.tracks, (track) => cleanTitle(track.title) === title);
 
             if(!isDefined(track)) {
-                Log.warn('Unable to find item %o (%o) in album %o', item, title, album);
+                Log.error('Unable to find track "%s" (%s) in album: %o', item.title, title, album);
                 return false;
             }
 
