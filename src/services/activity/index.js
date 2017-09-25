@@ -1,15 +1,15 @@
 import Find from 'lodash-es/find';
 import {Cache} from 'memory-cache';
 
-import ActivityService, {ActivityEngine} from 'eon.extension.framework/services/source/activity';
-import Log from 'eon.extension.source.googlemusic/core/logger';
-import MetadataApi from 'eon.extension.source.googlemusic/api/metadata';
-import Plugin from 'eon.extension.source.googlemusic/core/plugin';
-import Registry from 'eon.extension.framework/core/registry';
-import ShimApi from 'eon.extension.source.googlemusic/api/shim';
-import {Artist} from 'eon.extension.framework/models/item/music';
-import {isDefined} from 'eon.extension.framework/core/helpers';
-import {cleanTitle, encodeTitle} from 'eon.extension.source.googlemusic/core/helpers';
+import ActivityService, {ActivityEngine} from 'neon-extension-framework/services/source/activity';
+import Log from 'neon-extension-source-googlemusic/core/logger';
+import MetadataApi from 'neon-extension-source-googlemusic/api/metadata';
+import Plugin from 'neon-extension-source-googlemusic/core/plugin';
+import Registry from 'neon-extension-framework/core/registry';
+import ShimApi from 'neon-extension-source-googlemusic/api/shim';
+import {Artist} from 'neon-extension-framework/models/item/music';
+import {isDefined} from 'neon-extension-framework/core/helpers';
+import {cleanTitle, encodeTitle} from 'neon-extension-source-googlemusic/core/helpers';
 
 import PlayerMonitor from './player/monitor';
 

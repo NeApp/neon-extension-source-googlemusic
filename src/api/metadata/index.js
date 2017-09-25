@@ -1,6 +1,6 @@
 import URI from 'urijs';
 
-import {isDefined} from 'eon.extension.framework/core/helpers';
+import {isDefined} from 'neon-extension-framework/core/helpers';
 
 import Parser from './models';
 import ShimApi from '../shim';

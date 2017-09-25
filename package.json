@@ -1,5 +1,5 @@
 {
-  "name": "eon.extension.source.googlemusic",
+  "name": "neon-extension-source-googlemusic",
   "version": "1.1.0-beta",
   "main": "./src/index.js",
   "devDependencies": {

@@ -1,6 +1,6 @@
 import Merge from 'lodash-es/merge';
 
-import Log from 'eon.extension.source.googlemusic/core/logger';
+import Log from 'neon-extension-source-googlemusic/core/logger';
 
 
 const ResponseKeys = [

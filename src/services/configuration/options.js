@@ -1,5 +1,5 @@
-import {Group, Page, EnableOption, SelectOption} from 'eon.extension.framework/services/configuration/models';
-import Plugin from 'eon.extension.source.googlemusic/core/plugin';
+import {Group, Page, EnableOption, SelectOption} from 'neon-extension-framework/services/configuration/models';
+import Plugin from 'neon-extension-source-googlemusic/core/plugin';
 
 
 export default [

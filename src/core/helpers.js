@@ -1,4 +1,4 @@
-import {isDefined} from 'eon.extension.framework/core/helpers';
+import {isDefined} from 'neon-extension-framework/core/helpers';
 
 
 export function cleanTitle(value) {

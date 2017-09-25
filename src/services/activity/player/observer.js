@@ -1,8 +1,8 @@
 import EventEmitter from 'eventemitter3';
 import Merge from 'lodash-es/merge';
 
-import Log from 'eon.extension.source.googlemusic/core/logger';
-import {isDefined} from 'eon.extension.framework/core/helpers';
+import Log from 'neon-extension-source-googlemusic/core/logger';
+import {isDefined} from 'neon-extension-framework/core/helpers';
 
 
 export default class PlayerObserver extends EventEmitter {

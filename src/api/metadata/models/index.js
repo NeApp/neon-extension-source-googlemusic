@@ -1,7 +1,7 @@
 /* eslint-disable no-multi-spaces, key-spacing */
 import Map from 'lodash-es/map';
 
-import {isDefined} from 'eon.extension.framework/core/helpers';
+import {isDefined} from 'neon-extension-framework/core/helpers';
 
 import Album from './album';
 import Track from './track';

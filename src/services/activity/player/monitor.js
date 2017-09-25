@@ -1,10 +1,10 @@
 import EventEmitter from 'eventemitter3';
 import Merge from 'lodash-es/merge';
 
-import Log from 'eon.extension.source.googlemusic/core/logger';
-import {Artist, Album, Track} from 'eon.extension.framework/models/item/music';
-import {encodeTitle} from 'eon.extension.source.googlemusic/core/helpers';
-import {isDefined} from 'eon.extension.framework/core/helpers';
+import Log from 'neon-extension-source-googlemusic/core/logger';
+import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
+import {encodeTitle} from 'neon-extension-source-googlemusic/core/helpers';
+import {isDefined} from 'neon-extension-framework/core/helpers';
 
 import PlayerApi from './api';
 import PlayerObserver from './observer';

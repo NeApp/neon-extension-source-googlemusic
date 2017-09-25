@@ -5,13 +5,13 @@
     "transform-object-rest-spread",
     ["@fuzeman/module-resolver", {
       "root": [
-        "../eon.extension.browser.base/node_modules",
-        "../../Sources/eon.extension.source.googlemusic/node_modules"
+        "../neon-extension-browser-base/node_modules",
+        "../../Sources/neon-extension-source-googlemusic/node_modules"
       ],
       "alias": {
-        "eon.extension.browser": "./src",
-        "eon.extension.framework": "../../eon.extension.framework/src",
-        "eon.extension.source.googlemusic": "../../Sources/eon.extension.source.googlemusic/src"
+        "neon-extension-browser": "./src",
+        "neon-extension-framework": "../../neon-extension-framework/src",
+        "neon-extension-source-googlemusic": "../../Sources/neon-extension-source-googlemusic/src"
       }
     }]
   ]
