@@ -1,6 +1,6 @@
 {
-  "name": "Google Play Music",
-  "version": "1.1.0-beta",
+  "title": "Google Play Music",
+
   "content_scripts": [
     {
       "id": "source.googlemusic/main",
@@ -20,7 +20,19 @@
       ]
     }
   ],
+  "services": [
+    "configuration",
+    "migrate",
+
+    "source/activity",
+    "source/sync"
+  ],
   "web_accessible_resources": [
     "source/googlemusic/shim/shim.js"
-  ]
+  ],
+  "webpack": {
+    "chunks": [
+      "shim"
+    ]
+  }
 }
