@@ -10,7 +10,7 @@ export class GoogleMusicMigrateService extends MigrateService {
         super(Plugin);
     }
 
-    onPreferences(preferences) {
+    onLegacyPreferences(preferences) {
         Log.info('Migrating preferences...');
 
         // Enable plugin
