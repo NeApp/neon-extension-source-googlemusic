@@ -31,7 +31,7 @@
     "source/googlemusic/shim/shim.js"
   ],
   "webpack": {
-    "chunks": [
+    "modules": [
       "shim"
     ]
   }
