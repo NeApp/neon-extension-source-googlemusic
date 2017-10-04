@@ -1,6 +1,6 @@
 {
   "name": "neon-extension-source-googlemusic",
-  "version": "1.3.0-beta",
+  "version": "1.3.1-beta",
   "devDependencies": {
     "babel-core": "^7.0.0-beta.1",
     "babel-eslint": "^8.0.0",
