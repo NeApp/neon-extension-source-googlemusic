@@ -1,9 +1,9 @@
 import URI from 'urijs';
 
+import MetadataParser from 'neon-extension-source-googlemusic/metadata/parser';
 import {isDefined} from 'neon-extension-framework/core/helpers';
 
-import Parser from './models';
-import ShimApi from '../shim';
+import ShimApi from './shim';
 
 
 const BaseUrl = 'https://play.google.com/music/';
@@ -15,35 +15,35 @@ export class MetadataApi {
     }
 
     get deviceId() {
-        if(!isDefined(ShimApi.configuration) || !isDefined(ShimApi.configuration.flags)) {
+        if(!isDefined(ShimApi._configuration) || !isDefined(ShimApi._configuration.flags)) {
             return null;
         }
 
-        return ShimApi.configuration.flags[49];
+        return ShimApi._configuration.flags[49];
     }
 
     get user() {
-        if(!isDefined(ShimApi.configuration)) {
+        if(!isDefined(ShimApi._configuration)) {
             return null;
         }
 
-        return ShimApi.configuration.user;
+        return ShimApi._configuration.user;
     }
 
     get userId() {
-        if(!isDefined(ShimApi.configuration)) {
+        if(!isDefined(ShimApi._configuration)) {
             return null;
         }
 
-        return ShimApi.configuration.userId;
+        return ShimApi._configuration.userId;
     }
 
     get userToken() {
-        if(!isDefined(ShimApi.configuration)) {
+        if(!isDefined(ShimApi._configuration)) {
             return null;
         }
 
-        return ShimApi.configuration.userToken;
+        return ShimApi._configuration.userToken;
     }
 
     initialize(configuration, options) {
@@ -53,14 +53,17 @@ export class MetadataApi {
     fetchArtist(artistId, options) {
         options = options || {};
 
+        // Fetch artist
         return this.request('services/fetchartist', [[artistId]]);
     }
 
     fetchAlbum(albumId, options) {
         options = options || {};
 
+        // Fetch album
         return this.request('services/fetchalbum', [[albumId], options.includeArtist || false])
-            .then((data) => Parser.fromJsArray('album', data[1][0][0]));
+            // Parse response
+            .then((data) => MetadataParser.fromJsArray('album', data[1][0][0]));
     }
 
     request(name, args, options) {

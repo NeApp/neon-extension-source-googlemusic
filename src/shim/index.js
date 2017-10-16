@@ -14,49 +14,66 @@ export class ShimRequests extends EventEmitter {
     }
 
     _onRequest(e) {
-        if(!e || !e.detail || !e.detail.type) {
-            console.error('Unknown request received:', e);
+        if(!e || !e.detail) {
+            console.error('Invalid request received:', e);
             return;
         }
 
-        this.emit(e.detail.type, ...e.detail.args);
+        // Decode request
+        let request;
+
+        try {
+            request = JSON.parse(e.detail);
+        } catch(err) {
+            console.error('Unable to decode request: %s', err && err.message, err);
+            return;
+        }
+
+        // Emit request
+        this.emit(request.type, ...request.args);
     }
 }
 
 export class Shim {
     constructor() {
         this.requests = new ShimRequests();
-        this.requests.on('refresh', () => this.refresh());
+        this.requests.on('configuration', () => this.configuration());
 
-        // Initial refresh
-        this.refresh();
+        // Emit "configuration" event
+        this.configuration();
     }
 
-    emit(type, ...args) {
+    get userId() {
+        return window['USER_ID'];
+    }
+
+    configuration() {
+        let url = new URL(window.location.href);
+
+        // Emit "configuration" event
+        this._emit('configuration', {
+            flags: window['FLAGS'],
+
+            user: this._parseUser(url.searchParams.get('u')),
+            userId: this.userId,
+            userContext: window['USER_CONTEXT'],
+            userToken: Cookie.get('xt')
+        });
+    }
+
+    // region Private methods
+
+    _emit(type, ...args) {
         // Construct event
         let event = new CustomEvent('neon.event', {
-            detail: {
+            detail: JSON.stringify({
                 type: type,
                 args: args || []
-            }
+            })
         });
 
         // Emit event on the document
         document.body.dispatchEvent(event);
-    }
-
-    refresh() {
-        let url = new URL(window.location.href);
-
-        // Emit "ready" event
-        this.emit('ready', {
-            flags: window['FLAGS'],
-
-            user: this._parseUser(url.searchParams.get('u')),
-            userId: window['USER_ID'],
-            userContext: window['USER_CONTEXT'],
-            userToken: Cookie.get('xt')
-        });
     }
 
     _parseUser(value) {
@@ -70,6 +87,8 @@ export class Shim {
             return null;
         }
     }
+
+    // endregion
 }
 
 // Construct shim
