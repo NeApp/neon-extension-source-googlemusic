@@ -8,8 +8,7 @@ import Plugin from 'neon-extension-source-googlemusic/core/plugin';
 import Registry from 'neon-extension-framework/core/registry';
 import ShimApi from 'neon-extension-source-googlemusic/api/shim';
 import {Artist} from 'neon-extension-framework/models/item/music';
-import {isDefined} from 'neon-extension-framework/core/helpers';
-import {cleanTitle, encodeTitle} from 'neon-extension-source-googlemusic/core/helpers';
+import {cleanTitle, encodeTitle, isDefined} from 'neon-extension-framework/core/helpers';
 
 import PlayerMonitor from './player/monitor';
 
@@ -64,17 +63,9 @@ export class GoogleMusicActivityService extends ActivityService {
     }
 
     fetchMetadata(item) {
-        let albumId = item.album.ids['googlemusic'].id;
-
-        // Ensure album identifier is available
-        if(!isDefined(albumId)) {
-            return false;
-        }
-
-        // Fetch album metadata
-        return this.fetchAlbum(albumId).then((album) => {
+        return this.fetchAlbum(item.album.ids['googlemusic'].id).then((album) => {
             // Create album artist
-            item.album.artist = Artist.create({
+            item.album.artist = new Artist({
                 title: album.artistTitle,
 
                 ids: {
@@ -92,8 +83,9 @@ export class GoogleMusicActivityService extends ActivityService {
             let track = Find(album.tracks, (track) => cleanTitle(track.title) === title);
 
             if(!isDefined(track)) {
-                Log.error('Unable to find track "%s" (%s) in album: %o', item.title, title, album);
-                return false;
+                return Promise.reject(new Error(
+                    'Unable to find track "' + item.title + '" in album'
+                ));
             }
 
             // Determine if the item is being changed
@@ -110,14 +102,18 @@ export class GoogleMusicActivityService extends ActivityService {
             item.ids.googlemusic.id = track.id;
 
             item.changed = changed;
-            return true;
-        }, (err) => {
-            Log.warn('Unable to fetch album', err);
-            return false;
+
+            // Resolve promise with `item` instance
+            return item;
         });
     }
 
     fetchAlbum(albumId) {
+        if(!isDefined(albumId) || albumId.length <= 0) {
+            return Promise.reject();
+        }
+
+        // Retrieve album from cache
         let album = this.albums.get(albumId);
 
         if(isDefined(album)) {

@@ -3,8 +3,7 @@ import Merge from 'lodash-es/merge';
 
 import Log from 'neon-extension-source-googlemusic/core/logger';
 import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
-import {encodeTitle} from 'neon-extension-source-googlemusic/core/helpers';
-import {isDefined} from 'neon-extension-framework/core/helpers';
+import {encodeTitle, isDefined} from 'neon-extension-framework/core/helpers';
 
 import PlayerApi from './api';
 import PlayerObserver from './observer';
@@ -101,7 +100,7 @@ export default class PlayerMonitor extends EventEmitter {
         let trackId = albumId + '/' + encodeTitle($track.innerText);
 
         // Construct artist
-        let artist = Artist.create({
+        let artist = new Artist({
             title: $artist.innerText,
 
             ids: {
@@ -113,7 +112,7 @@ export default class PlayerMonitor extends EventEmitter {
         });
 
         // Construct album
-        let album = Album.create({
+        let album = new Album({
             title: $album.innerText,
 
             ids: {
@@ -125,7 +124,7 @@ export default class PlayerMonitor extends EventEmitter {
         });
 
         // Construct track
-        return Track.create({
+        return new Track({
             title: $track.innerText,
 
             artist: artist,
