@@ -1,8 +1,11 @@
 import EventEmitter from 'eventemitter3';
+import Filter from 'lodash-es/filter';
+import Map from 'lodash-es/map';
 import Merge from 'lodash-es/merge';
 
 import Extension from 'neon-extension-browser/extension';
 import Log from 'neon-extension-source-googlemusic/core/logger';
+import MetadataParser from 'neon-extension-source-googlemusic/metadata/parser';
 import {isDefined} from 'neon-extension-framework/core/helpers';
 import {createScript} from 'neon-extension-framework/core/helpers/script';
 
@@ -67,6 +70,25 @@ export class ShimApi extends EventEmitter {
         return this.inject()
             // Request configuration
             .then(() => this._request('configuration'));
+    }
+
+    library() {
+        // Ensure shim has been injected
+        return this.inject()
+            // Request tracks from library
+            .then(() => this._request('library'))
+            // Parse tracks
+            .then((tracks) => Filter(
+                Map(tracks, (item) => {
+                    try {
+                        return MetadataParser.fromJsArray('track', item);
+                    } catch(err) {
+                        Log.warn('Unable to parse track: %s', err && err.message, item, err);
+                        return null;
+                    }
+                }),
+                (track) => track !== null
+            ));
     }
 
     // region Private methods

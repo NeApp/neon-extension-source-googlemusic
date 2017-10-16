@@ -25,6 +25,7 @@
     "migrate",
 
     "source/activity",
+    "source/library",
     "source/sync"
   ],
   "web_accessible_resources": [
