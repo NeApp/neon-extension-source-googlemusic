@@ -53,7 +53,7 @@ export class GoogleMusicActivityService extends ActivityService {
         // Bind player monitor to page
         return ShimApi.inject()
             .then((configuration) => {
-                Log.debug('Configuration received: %o', configuration);
+                Log.trace('Configuration received');
 
                 // Initialize API clients
                 MetadataApi.initialize(configuration);
