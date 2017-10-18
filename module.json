@@ -3,7 +3,7 @@
 
   "content_scripts": [
     {
-      "id": "source.googlemusic/main",
+      "id": "main",
       "conditions": [
         {
           "pattern": "*://play.google.com/music/*",
