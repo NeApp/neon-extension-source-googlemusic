@@ -11,8 +11,25 @@ export class ShimRequests extends EventEmitter {
     constructor() {
         super();
 
-        // Bind to request event
-        document.body.addEventListener('neon.request', (e) => this._onRequest(e));
+        // Ensure body exists
+        if(!isDefined(document.body)) {
+            throw new Error('Body is not available');
+        }
+
+        // Bind to events
+        this._bind('neon.request', (e) => this._onRequest(e));
+    }
+
+    _bind(event, callback) {
+        try {
+            document.body.addEventListener(event, callback);
+        } catch(e) {
+            console.error('Unable to bind to "%s"', event, e);
+            return false;
+        }
+
+        console.debug('Bound to "%s"', event);
+        return true;
     }
 
     _onRequest(e) {

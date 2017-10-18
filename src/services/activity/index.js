@@ -9,6 +9,7 @@ import MetadataBuilder from 'neon-extension-source-googlemusic/metadata/builder'
 import Plugin from 'neon-extension-source-googlemusic/core/plugin';
 import Registry from 'neon-extension-framework/core/registry';
 import ShimApi from 'neon-extension-source-googlemusic/api/shim';
+import {awaitPage} from 'neon-extension-source-googlemusic/core/helpers';
 import {cleanTitle, isDefined} from 'neon-extension-framework/core/helpers';
 
 import PlayerMonitor from './player/monitor';
@@ -36,8 +37,10 @@ export class GoogleMusicActivityService extends ActivityService {
             isEnabled: () => true
         });
 
-        // Bind to page
-        this.bind();
+        // Bind once page has loaded
+        awaitPage().then(() =>
+            this.bind()
+        );
     }
 
     bind() {

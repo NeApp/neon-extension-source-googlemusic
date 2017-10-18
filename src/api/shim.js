@@ -14,8 +14,25 @@ export class ShimEvents extends EventEmitter {
     constructor() {
         super();
 
-        // Bind to request event
-        document.body.addEventListener('neon.event', (e) => this._onEvent(e));
+       // Ensure body exists
+        if(!isDefined(document.body)) {
+            throw new Error('Body is not available');
+        }
+
+        // Bind to events
+        this._bind('neon.event', (e) => this._onEvent(e));
+    }
+
+    _bind(event, callback) {
+        try {
+            document.body.addEventListener(event, callback);
+        } catch(e) {
+            Log.error('Unable to bind to "%s"', event, e);
+            return false;
+        }
+
+        Log.debug('Bound to "%s"', event);
+        return true;
     }
 
     _onEvent(e) {
@@ -43,9 +60,8 @@ export class ShimApi extends EventEmitter {
     constructor() {
         super();
 
-        this.events = new ShimEvents();
-
         this._configuration = {};
+        this._events = null;
 
         this._injected = false;
         this._injecting = null;
@@ -105,7 +121,7 @@ export class ShimApi extends EventEmitter {
             // Create timeout callback
             let timeoutId = setTimeout(() => {
                 if(isDefined(listener)) {
-                    this.events.removeListener(type, listener);
+                    this._events.removeListener(type, listener);
                 }
 
                 // Reject promise
@@ -121,7 +137,7 @@ export class ShimApi extends EventEmitter {
             };
 
             // Wait for event
-            this.events.once(type, listener);
+            this._events.once(type, listener);
         });
     }
 
@@ -159,6 +175,9 @@ export class ShimApi extends EventEmitter {
 
         return new Promise((resolve, reject) => {
             let script = createScript(document, Extension.getUrl('/source/googlemusic/shim/shim.js'));
+
+            // Create events interface
+            this._events = new ShimEvents();
 
             // Wait for "configuration" event
             this._await('configuration', {

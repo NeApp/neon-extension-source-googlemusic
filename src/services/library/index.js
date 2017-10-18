@@ -7,6 +7,7 @@ import MetadataBuilder from 'neon-extension-source-googlemusic/metadata/builder'
 import Plugin from 'neon-extension-source-googlemusic/core/plugin';
 import Registry from 'neon-extension-framework/core/registry';
 import ShimApi from 'neon-extension-source-googlemusic/api/shim';
+import {awaitPage} from 'neon-extension-source-googlemusic/core/helpers';
 
 
 export class GoogleMusicLibraryService extends LibraryService {
@@ -17,8 +18,10 @@ export class GoogleMusicLibraryService extends LibraryService {
     initialize() {
         super.initialize();
 
-        // Initial library update
-        this.refresh();
+        // Refresh library once page has loaded
+        awaitPage().then(() =>
+            this.refresh()
+        );
     }
 
     refresh() {
