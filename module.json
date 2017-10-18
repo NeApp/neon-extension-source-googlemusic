@@ -20,6 +20,10 @@
       ]
     }
   ],
+  "origins": [
+    "*://play.google.com/music/*"
+  ],
+
   "services": [
     "configuration",
     "migrate",
@@ -31,6 +35,7 @@
   "web_accessible_resources": [
     "source/googlemusic/shim/shim.js"
   ],
+
   "webpack": {
     "modules": [
       "shim"
