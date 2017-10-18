@@ -1,7 +1,7 @@
 import PickBy from 'lodash-es/pickBy';
 
+import ItemBuilder from 'neon-extension-framework/models/item';
 import Plugin from 'neon-extension-source-googlemusic/core/plugin';
-import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
 import {isDefined} from 'neon-extension-framework/core/helpers';
 
 
@@ -19,28 +19,28 @@ export class MetadataBuilder {
             return null;
         }
 
-        // Create artist
-        let artist = new Artist({
+        // Artist
+        let artist = {
             title: item.artistTitle,
 
             ids: this.createIds({
                 id: item.artistId
             })
-        });
+        };
 
-        // Create album
-        let album = new Album({
+        // Album
+        let album = {
             title: item.albumTitle,
 
             ids: this.createIds({
                 id: item.albumId
-            })
-        }, {
-            artist: this.createAlbumArtist(item) || artist
-        });
+            }),
+
+            artist: this.getAlbumArtist(item) || artist
+        };
 
         // Create track
-        return new Track({
+        return ItemBuilder.createTrack({
             title: item.title,
 
             number: item.number,
@@ -48,29 +48,35 @@ export class MetadataBuilder {
 
             ids: this.createIds({
                 id: item.trackId
-            })
-        }, {
-            artist: artist,
-            album: album
+            }),
+
+            artist,
+            album
         });
     }
 
-    createAlbumArtist(item) {
+    getAlbumArtist(item) {
         if(!isDefined(item.albumArtistTitle) || item.albumArtistTitle.length < 1) {
             return null;
         }
 
-        return new Artist({
+        return {
             title: item.albumArtistTitle
-        });
+        };
     }
 
     createIds(values) {
+        values = PickBy(values, (value) => isDefined(value) && value.length > 0);
+
+        // Ensure identifiers exist
+        if(Object.keys(values) < 1) {
+            return {};
+        }
+
+        // Build identifiers object
         let ids = {};
 
-        ids[Plugin.id] = PickBy(values, (value) =>
-            isDefined(value)
-        );
+        ids[Plugin.id] = values;
 
         return ids;
     }

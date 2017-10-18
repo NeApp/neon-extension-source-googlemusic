@@ -1,9 +1,10 @@
 import EventEmitter from 'eventemitter3';
 import Merge from 'lodash-es/merge';
 
+import ItemBuilder from 'neon-extension-framework/models/item';
 import Log from 'neon-extension-source-googlemusic/core/logger';
-import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
-import {encodeTitle, isDefined} from 'neon-extension-framework/core/helpers';
+import MetadataBuilder from 'neon-extension-source-googlemusic/metadata/builder';
+import {isDefined} from 'neon-extension-framework/core/helpers';
 
 import PlayerApi from './api';
 import PlayerObserver from './observer';
@@ -96,45 +97,30 @@ export default class PlayerMonitor extends EventEmitter {
         let artistId = $artist.getAttribute('data-id');
         let albumId = $album.getAttribute('data-id');
 
-        // Generate track path
-        let trackId = albumId + '/' + encodeTitle($track.innerText);
-
         // Construct artist
-        let artist = new Artist({
+        let artist = {
             title: $artist.innerText,
 
-            ids: {
-                googlemusic: {
-                    id: this._getId(artistId),
-                    path: artistId
-                }
-            }
-        });
+            ids: MetadataBuilder.createIds({
+                id: this._getId(artistId)
+            })
+        };
 
         // Construct album
-        let album = new Album({
+        let album = {
             title: $album.innerText,
 
-            ids: {
-                googlemusic: {
-                    id: this._getId(albumId),
-                    path: albumId
-                }
-            }
-        });
+            ids: MetadataBuilder.createIds({
+                id: this._getId(albumId)
+            })
+        };
 
         // Construct track
-        return new Track({
+        return ItemBuilder.createTrack({
             title: $track.innerText,
 
-            artist: artist,
-            album: album,
-
-            ids: {
-                googlemusic: {
-                    path: trackId
-                }
-            }
+            artist,
+            album
         });
     }
 

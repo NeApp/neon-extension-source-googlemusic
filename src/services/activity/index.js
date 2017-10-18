@@ -1,14 +1,15 @@
 import Find from 'lodash-es/find';
+import Get from 'lodash-es/get';
 import {Cache} from 'memory-cache';
 
 import ActivityService, {ActivityEngine} from 'neon-extension-framework/services/source/activity';
 import Log from 'neon-extension-source-googlemusic/core/logger';
 import MetadataApi from 'neon-extension-source-googlemusic/api/metadata';
+import MetadataBuilder from 'neon-extension-source-googlemusic/metadata/builder';
 import Plugin from 'neon-extension-source-googlemusic/core/plugin';
 import Registry from 'neon-extension-framework/core/registry';
 import ShimApi from 'neon-extension-source-googlemusic/api/shim';
-import {Artist} from 'neon-extension-framework/models/item/music';
-import {cleanTitle, encodeTitle, isDefined} from 'neon-extension-framework/core/helpers';
+import {cleanTitle, isDefined} from 'neon-extension-framework/core/helpers';
 
 import PlayerMonitor from './player/monitor';
 
@@ -63,16 +64,25 @@ export class GoogleMusicActivityService extends ActivityService {
     }
 
     fetchMetadata(item) {
-        return this.fetchAlbum(item.album.ids['googlemusic'].id).then((album) => {
-            // Create album artist
-            item.album.artist = new Artist({
-                title: album.artistTitle,
+        let albumId = Get(item.album.ids, [Plugin.id, 'id']);
 
-                ids: {
-                    googlemusic: {
-                        id: album.artistId,
-                        path: album.artistId + '/' + encodeTitle(album.artistTitle)
-                    }
+        // Ensure identifier exists
+        if(!isDefined(albumId)) {
+            return Promise.resolve(item);
+        }
+
+        // Fetch album metadata
+        Log.debug('Fetching metadata for item: %o', item);
+
+        return this.fetchAlbum(albumId).then((album) => {
+            // Update album
+            item.album.update({
+                artist: {
+                    title: album.artistTitle,
+
+                    ids: MetadataBuilder.createIds({
+                        id: album.artistId
+                    })
                 }
             });
 
@@ -84,26 +94,20 @@ export class GoogleMusicActivityService extends ActivityService {
 
             if(!isDefined(track)) {
                 return Promise.reject(new Error(
-                    'Unable to find track "' + item.title + '" in album'
+                    'Unable to find track "' + item.title + '" in album "' + item.album.title + '"'
                 ));
             }
 
-            // Determine if the item is being changed
-            let changed = (
-                item.number !== track.number ||
-                item.duration !== track.duration ||
-                item.ids.googlemusic.id !== track.id
-            );
-
             // Update item
-            item.number = track.number;
-            item.duration = track.duration;
+            item.update({
+                ids: MetadataBuilder.createIds({
+                    id: track.id
+                }),
 
-            item.ids.googlemusic.id = track.id;
+                number: track.number,
+                duration: track.duration
+            });
 
-            item.changed = changed;
-
-            // Resolve promise with `item` instance
             return item;
         });
     }
