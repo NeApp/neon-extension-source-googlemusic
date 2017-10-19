@@ -90,12 +90,15 @@ export class GoogleMusicActivityService extends ActivityService {
             });
 
             // Clean item title (for matching)
-            let title = cleanTitle(item.title);
+            let title = this._cleanTitle(item.title);
 
             // Find matching track
-            let track = Find(album.tracks, (track) => cleanTitle(track.title) === title);
+            let track = Find(album.tracks, (track) => this._cleanTitle(track.title) === title);
 
             if(!isDefined(track)) {
+                Log.debug('Unable to find track "%s" (%s) in album: %o', item.title, title, album.tracks);
+
+                // Reject promise
                 return Promise.reject(new Error(
                     'Unable to find track "' + item.title + '" in album "' + item.album.title + '"'
                 ));
@@ -135,6 +138,10 @@ export class GoogleMusicActivityService extends ActivityService {
             // Return album
             return album;
         });
+    }
+
+    _cleanTitle(title) {
+        return cleanTitle(title).replace(/\s/g, '');
     }
 }
 
