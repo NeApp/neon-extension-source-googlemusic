@@ -1,0 +1,13 @@
+language: node_js
+node_js:
+- '7'
+script:
+- npm run test
+deploy:
+  provider: npm
+  email: neapp-ci@me.dgardiner.net
+  api_key:
+    secure: EpHcMRl2nuLeGQrICt5SkV4Czs1FI3R9XP6xqK7ScTyBMig91kQ2VhvE3VfwFc2rAwjwC0/szKnRNz5MkJSSlwgcNig9ATnpLH9/5H/T2ITeY1sYkGW63yh1yrr0dK7M3cACUxqBSZPC+0FuAYprZ3bJMNxbu7v8N5UWXMkRSRtJ/9e89y47F/ppmmYui38CtaFkd/lq8J/fGUMtDLMN78A/EFg5Ba1FEo1/ZH47JcTs3NONGHWLtbctmawTVn0m9U3dgZ4izNt8rU/5WQU/6fQzjLNMjqA/T0qxc6o7k5ESSSziMtdvO+L0nYTgAoCH7dzy4m63y+NSJmlvLnQs6dIJ6SU7hMfGWysexIu2uIyBlzL1eC/Vo7w9zZ+XcAho+dalm5zVg8rqyaJkOxb+9fEubGKq7paqTd0zvW50T/Oy+fT89X1UOcgLrYw9g9hQ+az0tRlyLwxkr3C3S6vPwvYtggeE6JaGki7inDePSViuVYEn+oDoGnpL3Df4p7bgWlHMvA+nM3VohEkpeVuvG5ASDwzj0eeCCY9Dn8KLonu8msQXw+dqG6LPqgob6MzBxOqBEscKvUvDFm+Me6sRJHyqKAPsROZ0SwZZHJO4rBB8dnfaeOsb65jLqIIW/4gwYnM5dMA+2iFjnXSuTnKjM5g2OAEdw4ggoo878BA4nso=
+  on:
+    repo: NeApp/neon-extension-source-googlemusic
+    tags: true
