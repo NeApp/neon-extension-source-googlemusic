@@ -41,21 +41,22 @@ export default class PlayerMonitor extends EventEmitter {
     // region Event handlers
 
     _onTrackChanged($artist, $album, $track) {
-        // Try construct track
-        let track;
+        let track = null;
 
+        // Try construct track
         try {
             track = this._constructTrack($artist, $album, $track);
         } catch(e) {
             Log.error('Unable to construct track: %s', e.message, e);
-            return;
         }
 
+        // Ensure track exists
         if(!isDefined(track)) {
             this._currentTrack = null;
             return;
         }
 
+        // Ensure track has changed
         if(isDefined(this._currentTrack) && this._currentTrack.matches(track)) {
             return;
         }
@@ -89,13 +90,12 @@ export default class PlayerMonitor extends EventEmitter {
     // region Private methods
 
     _constructTrack($artist, $album, $track) {
-        if(!isDefined($artist) || !isDefined($album) || !isDefined($track)) {
+        if(!isDefined($artist) || !isDefined($track)) {
             return null;
         }
 
         // Retrieve paths
         let artistId = $artist.getAttribute('data-id');
-        let albumId = $album.getAttribute('data-id');
 
         // Construct artist
         let artist = {
@@ -106,22 +106,38 @@ export default class PlayerMonitor extends EventEmitter {
             })
         };
 
-        // Construct album
-        let album = {
-            title: $album.innerText,
-
-            ids: MetadataBuilder.createIds({
-                id: this._getId(albumId)
-            })
-        };
-
         // Construct track
         return ItemBuilder.createTrack({
             title: $track.innerText,
 
-            artist,
-            album
+            // Children
+            album: this._buildAlbum($album),
+            artist
         });
+    }
+
+    _buildAlbum($album) {
+        let id = null;
+        let title = null;
+
+        // Retrieve details
+        if(isDefined($album)) {
+            id = $album.getAttribute('data-id');
+
+            // Retrieve title
+            if(isDefined($album.innerText) && $album.innerText.length >= 1) {
+                title = $album.innerText;
+            }
+        }
+
+        // Build album
+        return {
+            title: title,
+
+            ids: MetadataBuilder.createIds({
+                id: this._getId(id)
+            })
+        };
     }
 
     _getId(value) {
