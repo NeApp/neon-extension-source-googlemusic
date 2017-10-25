@@ -70,8 +70,14 @@ export class MetadataApi {
 
         // Fetch album
         return this.request('services/fetchalbum', [[albumId], options.includeArtist || false])
-            // Parse response
-            .then((data) => MetadataParser.fromJsArray('album', data[1][0][0]));
+            .then((data) => {
+                if(!isDefined(data[1]) || !Array.isArray(data[1])) {
+                    return Promise.reject(new Error('Not Found'));
+                }
+
+                // Parse response
+                return MetadataParser.fromJsArray('album', data[1][0][0]);
+            });
     }
 
     request(name, args, options) {
