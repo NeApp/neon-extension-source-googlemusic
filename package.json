@@ -1,6 +1,6 @@
 {
   "name": "neon-extension-source-googlemusic",
-  "version": "1.5.0-beta.1",
+  "version": "1.5.1-beta.1",
   "devDependencies": {
     "babel-core": "^7.0.0-beta.1",
     "babel-eslint": "^8.0.0",
@@ -21,7 +21,7 @@
   "peerDependencies": {
     "eventemitter3": "^2.0.0",
     "lodash-es": "^4.16.1",
-    "neon-extension-framework": "^1.5.0-beta.1",
+    "neon-extension-framework": "^1.5.1-beta.1",
     "urijs": "^1.18.2"
   }
 }
