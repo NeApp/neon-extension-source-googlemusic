@@ -7,15 +7,12 @@ import {isDefined} from 'neon-extension-framework/core/helpers';
 
 export class MetadataBuilder {
     createTrack(item) {
-        if(!isDefined(item)) {
+        if(!isDefined(item) || !isDefined(item.artistId) || !isDefined(item.albumId)) {
             return null;
         }
 
+        // Ensure artist title is valid
         if(!isDefined(item.artistTitle) || item.artistTitle.length < 1) {
-            return null;
-        }
-
-        if(!isDefined(item.albumTitle) || item.albumTitle.length < 1) {
             return null;
         }
 
@@ -26,17 +23,6 @@ export class MetadataBuilder {
             ids: this.createIds({
                 id: item.artistId
             })
-        };
-
-        // Album
-        let album = {
-            title: item.albumTitle,
-
-            ids: this.createIds({
-                id: item.albumId
-            }),
-
-            artist: this.getAlbumArtist(item) || artist
         };
 
         // Create track
@@ -50,16 +36,39 @@ export class MetadataBuilder {
                 id: item.trackId
             }),
 
-            artist,
-            album
+            // Children
+            album: this.buildAlbum(item, artist),
+            artist
         });
     }
 
-    getAlbumArtist(item) {
+    buildAlbum(item, artist) {
+        let title = null;
+
+        // Retrieve title
+        if(isDefined(item.albumTitle) && item.albumTitle.length >= 1) {
+            title = item.albumTitle;
+        }
+
+        // Build album
+        return {
+            title,
+
+            ids: this.createIds({
+                id: item.albumId
+            }),
+
+            // Children
+            artist: this.buildAlbumArtist(item) || artist
+        };
+    }
+
+    buildAlbumArtist(item) {
         if(!isDefined(item.albumArtistTitle) || item.albumArtistTitle.length < 1) {
             return null;
         }
 
+        // Build album artist
         return {
             title: item.albumArtistTitle
         };
