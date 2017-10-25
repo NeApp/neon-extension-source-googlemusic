@@ -16,9 +16,12 @@ export class MetadataBuilder {
             return null;
         }
 
+        let fetchedAt = Date.now();
+
         // Artist
         let artist = {
             title: item.artistTitle,
+            fetchedAt,
 
             ids: this.createIds({
                 id: item.artistId
@@ -32,17 +35,19 @@ export class MetadataBuilder {
             number: item.number,
             duration: item.duration,
 
+            fetchedAt,
+
             ids: this.createIds({
                 id: item.trackId
             }),
 
             // Children
-            album: this.buildAlbum(item, artist),
+            album: this.buildAlbum(item, artist, fetchedAt),
             artist
         });
     }
 
-    buildAlbum(item, artist) {
+    buildAlbum(item, artist, fetchedAt) {
         let title = null;
 
         // Retrieve title
@@ -53,24 +58,26 @@ export class MetadataBuilder {
         // Build album
         return {
             title,
+            fetchedAt,
 
             ids: this.createIds({
                 id: item.albumId
             }),
 
             // Children
-            artist: this.buildAlbumArtist(item) || artist
+            artist: this.buildAlbumArtist(item, fetchedAt) || artist
         };
     }
 
-    buildAlbumArtist(item) {
+    buildAlbumArtist(item, fetchedAt) {
         if(!isDefined(item.albumArtistTitle) || item.albumArtistTitle.length < 1) {
             return null;
         }
 
         // Build album artist
         return {
-            title: item.albumArtistTitle
+            title: item.albumArtistTitle,
+            fetchedAt
         };
     }
 

@@ -74,12 +74,19 @@ export class GoogleMusicActivityService extends ActivityService {
             return Promise.resolve(item);
         }
 
+        let fetchedAt = Date.now();
+
+        // Update item `fetchedAt` timestamp
+        item.update({ fetchedAt });
+
         // Fetch album metadata
         Log.debug('Fetching metadata for item: %o', item);
 
         return this.fetchAlbum(albumId).then((album) => {
             // Update album
             item.album.update({
+                fetchedAt,
+
                 artist: {
                     title: album.artistTitle,
 
