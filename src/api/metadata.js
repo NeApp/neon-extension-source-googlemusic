@@ -46,6 +46,14 @@ export class MetadataApi {
         return ShimApi._configuration.userToken;
     }
 
+    get userType() {
+        if(!isDefined(ShimApi._configuration)) {
+            return null;
+        }
+
+        return ShimApi._configuration.userContext[13];
+    }
+
     initialize(configuration, options) {
 
     }
