@@ -1,6 +1,26 @@
 {
   "name": "neon-extension-source-googlemusic",
   "version": "1.5.1-beta.1",
+  "description": "Neon Extension: Google Play Music",
+  "keywords": ["neon", "neon-extension", "google-music"],
+  "homepage": "https://github.com/NeApp/neon-extension",
+  "author": "Dean Gardiner <me@dgardiner.net>",
+  "license": "GPL-3.0",
+  "main": "./src",
+  "bugs": {
+    "url": "https://github.com/NeApp/neon-extension/issues"
+  },
+  "repostitory": {
+    "type": "git",
+    "url": "https://github.com/NeApp/neon-extension-source-googlemusic"
+  },
+  "scripts": {
+    "test": "echo No tests available yet."
+  },
+  "dependencies": {
+    "js-cookie": "2.1.4",
+    "memory-cache": "0.2.0"
+  },
   "devDependencies": {
     "babel-core": "^7.0.0-beta.1",
     "babel-eslint": "^8.0.0",
@@ -14,17 +34,10 @@
     "eslint-plugin-import": "^2.7.0",
     "eslint-plugin-react": "^6.3.0"
   },
-  "dependencies": {
-    "js-cookie": "2.1.4",
-    "memory-cache": "0.2.0"
-  },
   "peerDependencies": {
     "eventemitter3": "^2.0.0",
     "lodash-es": "^4.16.1",
     "neon-extension-framework": "^1.5.1-beta.1",
     "urijs": "^1.18.2"
-  },
-  "scripts": {
-    "test": "echo No tests available yet."
   }
 }
