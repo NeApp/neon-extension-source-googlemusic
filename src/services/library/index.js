@@ -48,7 +48,7 @@ export class GoogleMusicLibraryService extends LibraryService {
             }
 
             // Emit tracks to background service
-            this.messaging.emit('library.update', {
+            this.emit('library.update', {
                 items: tracks,
                 source: Plugin.id
             });
