@@ -25,6 +25,11 @@ export class GoogleMusicActivityService extends ActivityService {
         this.monitor = null;
 
         this.albums = new Cache();
+
+        // Subscribe to "library" events
+        this.library = this.messaging.service('library');
+
+        this.library.on('library.update.finished', this.onLibraryUpdateFinished.bind(this));
     }
 
     initialize() {
@@ -36,11 +41,6 @@ export class GoogleMusicActivityService extends ActivityService {
 
             isEnabled: () => true
         });
-
-        // Bind once page has loaded
-        awaitPage().then(() =>
-            this.bind()
-        );
     }
 
     bind() {
@@ -145,6 +145,19 @@ export class GoogleMusicActivityService extends ActivityService {
             // Return album
             return album;
         });
+    }
+
+    onLibraryUpdateFinished({ clientId }) {
+        if(clientId !== this.library.client.id) {
+            return;
+        }
+
+        Log.trace('Library update finished');
+
+        // Bind once page has loaded
+        awaitPage().then(() =>
+            this.bind()
+        );
     }
 
     _cleanTitle(title) {
