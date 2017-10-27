@@ -1,6 +1,6 @@
 {
   "name": "neon-extension-source-googlemusic",
-  "version": "1.5.1-beta.2",
+  "version": "1.5.1-beta.4",
   "description": "Neon Extension: Google Play Music",
   "keywords": ["neon", "neon-extension", "google-music"],
   "homepage": "https://github.com/NeApp/neon-extension",
@@ -37,7 +37,7 @@
   "peerDependencies": {
     "eventemitter3": "^2.0.0",
     "lodash-es": "^4.16.1",
-    "neon-extension-framework": "^1.5.1-beta.1",
+    "neon-extension-framework": "^1.5.1-beta.4",
     "urijs": "^1.18.2"
   }
 }
