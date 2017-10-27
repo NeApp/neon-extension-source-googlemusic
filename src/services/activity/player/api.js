@@ -1,6 +1,7 @@
 import Merge from 'lodash-es/merge';
 
 import Log from 'neon-extension-source-googlemusic/core/logger';
+import {isDefined} from 'neon-extension-framework/core/helpers';
 
 
 const ResponseKeys = [
@@ -44,6 +45,11 @@ export default class PlayerApi {
     request(code, options) {
         options = typeof options !== 'undefined' ? options : {};
 
+        // Ensure we are bound
+        if(!isDefined(this._node)) {
+            return Promise.reject(new Error('Page hasn\'t been bound'));
+        }
+
         // Create request event
         let event = new CustomEvent('playerApi', {
             detail: JSON.stringify([
@@ -63,7 +69,7 @@ export default class PlayerApi {
             if(this._hasResponse(code)) {
                 this._responseCallback = function(result) {
                     // Cancel timeout trigger
-                    if(timeout != null) {
+                    if(isDefined(timeout)) {
                         clearTimeout(timeout);
                     }
 
@@ -99,7 +105,7 @@ export default class PlayerApi {
     _onResponse(event) {
         let response = event.detail;
 
-        if(response == null) {
+        if(!isDefined(response)) {
             Log.warn('Invalid response returned:', response);
             return;
         }
@@ -117,7 +123,7 @@ export default class PlayerApi {
             }
         }
 
-        if(code === null) {
+        if(!isDefined(code)) {
             Log.warn('Unable to find response code in response object:', response);
             return;
         }

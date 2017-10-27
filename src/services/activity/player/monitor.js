@@ -176,6 +176,11 @@ export default class PlayerMonitor extends EventEmitter {
 
                 // Queue next read
                 setTimeout(get, this.options.progressInterval);
+            }, (err) => {
+                Log.warn('Unable to request current time: %s', err);
+
+                // Queue next read
+                setTimeout(get, this.options.progressInterval);
             });
         };
 

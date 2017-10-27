@@ -55,6 +55,15 @@ export default class PlayerObserver extends EventEmitter {
                     childList: true
                 });
 
+                // Emit initial "queue.created" event
+                if(!this._isHidden(this.$playerSongInfo.attributes.style.value)) {
+                    this.emit('queue.created');
+                }
+
+                // Emit initial "track.changed" event
+                this._onPlayingInfoChanged(this.$playerSongInfo.querySelector('.now-playing-info-wrapper'));
+
+                // Resolve promise
                 resolve();
             };
 
@@ -96,6 +105,10 @@ export default class PlayerObserver extends EventEmitter {
     }
 
     _onPlayingInfoChanged(node) {
+        if(!isDefined(node)) {
+            return;
+        }
+
         // Emit "changed" event
         this.emit('track.changed',
             node.querySelector('.player-artist'),
