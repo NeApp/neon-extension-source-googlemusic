@@ -1,5 +1,6 @@
 import URI from 'urijs';
 
+import Log from 'neon-extension-source-googlemusic/core/logger';
 import MetadataParser from 'neon-extension-source-googlemusic/metadata/parser';
 import {isDefined} from 'neon-extension-framework/core/helpers';
 
@@ -69,15 +70,48 @@ export class MetadataApi {
         options = options || {};
 
         // Fetch album
-        return this.request('services/fetchalbum', [[albumId], options.includeArtist || false])
-            .then((data) => {
-                if(!isDefined(data[1]) || !Array.isArray(data[1])) {
-                    return Promise.reject(new Error('Not Found'));
-                }
+        return this.request('services/fetchalbum', [[albumId], options.includeArtist || false]).then((data) => {
+            if(!isDefined(data) || !Array.isArray(data) || data.length < 1) {
+                return Promise.reject(new Error('Invalid Response'));
+            }
 
-                // Parse response
-                return MetadataParser.fromJsArray('album', data[1][0][0]);
-            });
+            // Validate header
+            let header = data[0];
+
+            if(!isDefined(header) || !Array.isArray(header) || header.length !== 4) {
+                Log.error('[fetchAlbum] Invalid Header: %o', header);
+
+                return Promise.reject(new Error(
+                    'Invalid Header'
+                ));
+            }
+
+            // Validate status code
+            let status = header[0];
+
+            if(status === 2) {
+                return Promise.reject(new Error('Not Found (albumId: "' + albumId + '")'));
+            } else if(status === 4) {
+                return Promise.reject(new Error('Invalid Token'));
+            } else if(status !== 0) {
+                return Promise.reject(new Error('Unknown Response (status: ' + status + ')'));
+            }
+
+            // Ensure payload is available
+            if(data.length < 2) {
+                return Promise.reject(new Error('No Payload Available'));
+            }
+
+            // Validate payload
+            let payload = data[1];
+
+            if(!isDefined(payload) || !Array.isArray(payload)) {
+                return Promise.reject(new Error('Invalid Payload'));
+            }
+
+            // Parse response
+            return MetadataParser.fromJsArray('album', data[1][0][0]);
+        });
     }
 
     request(name, args, options) {
