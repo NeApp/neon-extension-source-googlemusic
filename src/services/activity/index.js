@@ -1,5 +1,6 @@
 import Find from 'lodash-es/find';
 import Get from 'lodash-es/get';
+import IsNil from 'lodash-es/isNil';
 import {Cache} from 'memory-cache';
 
 import ActivityService, {ActivityEngine} from 'neon-extension-framework/services/source/activity';
@@ -10,7 +11,7 @@ import Plugin from 'neon-extension-source-googlemusic/core/plugin';
 import Registry from 'neon-extension-framework/core/registry';
 import ShimApi from 'neon-extension-source-googlemusic/api/shim';
 import {awaitPage} from 'neon-extension-source-googlemusic/core/helpers';
-import {cleanTitle, isDefined} from 'neon-extension-framework/core/helpers';
+import {cleanTitle} from 'neon-extension-framework/core/helpers';
 
 import PlayerMonitor from './player/monitor';
 
@@ -70,7 +71,7 @@ export class GoogleMusicActivityService extends ActivityService {
         let albumId = Get(item.album.ids, [Plugin.id, 'id']);
 
         // Ensure identifier exists
-        if(!isDefined(albumId)) {
+        if(IsNil(albumId)) {
             return Promise.resolve(item);
         }
 
@@ -102,7 +103,7 @@ export class GoogleMusicActivityService extends ActivityService {
             // Find matching track
             let track = Find(album.tracks, (track) => this._cleanTitle(track.title) === title);
 
-            if(!isDefined(track)) {
+            if(IsNil(track)) {
                 Log.debug('Unable to find track "%s" (%s) in album: %o', item.title, title, album.tracks);
 
                 // Reject promise
@@ -126,14 +127,14 @@ export class GoogleMusicActivityService extends ActivityService {
     }
 
     fetchAlbum(albumId) {
-        if(!isDefined(albumId) || albumId.length <= 0) {
+        if(IsNil(albumId) || albumId.length <= 0) {
             return Promise.reject();
         }
 
         // Retrieve album from cache
         let album = this.albums.get(albumId);
 
-        if(isDefined(album)) {
+        if(!IsNil(album)) {
             return Promise.resolve(album);
         }
 

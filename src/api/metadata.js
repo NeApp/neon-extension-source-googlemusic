@@ -1,8 +1,8 @@
+import IsNil from 'lodash-es/isNil';
 import URI from 'urijs';
 
 import Log from 'neon-extension-source-googlemusic/core/logger';
 import MetadataParser from 'neon-extension-source-googlemusic/metadata/parser';
-import {isDefined} from 'neon-extension-framework/core/helpers';
 
 import ShimApi from './shim';
 
@@ -16,7 +16,7 @@ export class MetadataApi {
     }
 
     get deviceId() {
-        if(!isDefined(ShimApi._configuration) || !isDefined(ShimApi._configuration.flags)) {
+        if(IsNil(ShimApi._configuration) || IsNil(ShimApi._configuration.flags)) {
             return null;
         }
 
@@ -24,7 +24,7 @@ export class MetadataApi {
     }
 
     get user() {
-        if(!isDefined(ShimApi._configuration)) {
+        if(IsNil(ShimApi._configuration)) {
             return null;
         }
 
@@ -32,7 +32,7 @@ export class MetadataApi {
     }
 
     get userId() {
-        if(!isDefined(ShimApi._configuration)) {
+        if(IsNil(ShimApi._configuration)) {
             return null;
         }
 
@@ -40,7 +40,7 @@ export class MetadataApi {
     }
 
     get userToken() {
-        if(!isDefined(ShimApi._configuration)) {
+        if(IsNil(ShimApi._configuration)) {
             return null;
         }
 
@@ -48,7 +48,7 @@ export class MetadataApi {
     }
 
     get userType() {
-        if(!isDefined(ShimApi._configuration)) {
+        if(IsNil(ShimApi._configuration)) {
             return null;
         }
 
@@ -71,14 +71,14 @@ export class MetadataApi {
 
         // Fetch album
         return this.request('services/fetchalbum', [[albumId], options.includeArtist || false]).then((data) => {
-            if(!isDefined(data) || !Array.isArray(data) || data.length < 1) {
+            if(IsNil(data) || !Array.isArray(data) || data.length < 1) {
                 return Promise.reject(new Error('Invalid Response'));
             }
 
             // Validate header
             let header = data[0];
 
-            if(!isDefined(header) || !Array.isArray(header) || header.length !== 4) {
+            if(IsNil(header) || !Array.isArray(header) || header.length !== 4) {
                 Log.error('[fetchAlbum] Invalid Header: %o', header);
 
                 return Promise.reject(new Error(
@@ -105,7 +105,7 @@ export class MetadataApi {
             // Validate payload
             let payload = data[1];
 
-            if(!isDefined(payload) || !Array.isArray(payload)) {
+            if(IsNil(payload) || !Array.isArray(payload)) {
                 return Promise.reject(new Error('Invalid Payload'));
             }
 
@@ -115,19 +115,19 @@ export class MetadataApi {
     }
 
     request(name, args, options) {
-        if(!isDefined(this.deviceId)) {
+        if(IsNil(this.deviceId)) {
             return Promise.reject(new Error('Device identifier is not defined'));
         }
 
-        if(!isDefined(this.sessionId)) {
+        if(IsNil(this.sessionId)) {
             return Promise.reject(new Error('Session identifier is not defined'));
         }
 
-        if(!isDefined(this.userId)) {
+        if(IsNil(this.userId)) {
             return Promise.reject(new Error('User identifier is not defined'));
         }
 
-        if(!isDefined(this.userToken)) {
+        if(IsNil(this.userToken)) {
             return Promise.reject(new Error('User token is not defined'));
         }
 
@@ -139,7 +139,7 @@ export class MetadataApi {
             format: 'jsarray'
         };
 
-        if(isDefined(this.user)) {
+        if(!IsNil(this.user)) {
             query['u'] = this.user;
         }
 

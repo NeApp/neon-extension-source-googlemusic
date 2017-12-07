@@ -1,7 +1,7 @@
+import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
 import Log from 'neon-extension-source-googlemusic/core/logger';
-import {isDefined} from 'neon-extension-framework/core/helpers';
 
 
 const ResponseKeys = [
@@ -46,7 +46,7 @@ export default class PlayerApi {
         options = typeof options !== 'undefined' ? options : {};
 
         // Ensure we are bound
-        if(!isDefined(this._node)) {
+        if(IsNil(this._node)) {
             return Promise.reject(new Error('Page hasn\'t been bound'));
         }
 
@@ -69,7 +69,7 @@ export default class PlayerApi {
             if(this._hasResponse(code)) {
                 this._responseCallback = function(result) {
                     // Cancel timeout trigger
-                    if(isDefined(timeout)) {
+                    if(!IsNil(timeout)) {
                         clearTimeout(timeout);
                     }
 
@@ -105,7 +105,7 @@ export default class PlayerApi {
     _onResponse(event) {
         let response = event.detail;
 
-        if(!isDefined(response)) {
+        if(IsNil(response)) {
             Log.warn('Invalid response returned:', response);
             return;
         }
@@ -123,7 +123,7 @@ export default class PlayerApi {
             }
         }
 
-        if(!isDefined(code)) {
+        if(IsNil(code)) {
             Log.warn('Unable to find response code in response object:', response);
             return;
         }

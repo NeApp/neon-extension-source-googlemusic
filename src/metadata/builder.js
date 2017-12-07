@@ -1,18 +1,18 @@
 import PickBy from 'lodash-es/pickBy';
+import IsNil from 'lodash-es/isNil';
 
 import ItemBuilder from 'neon-extension-framework/models/item';
 import Plugin from 'neon-extension-source-googlemusic/core/plugin';
-import {isDefined} from 'neon-extension-framework/core/helpers';
 
 
 export class MetadataBuilder {
     createTrack(item) {
-        if(!isDefined(item) || !isDefined(item.artistId) || !isDefined(item.albumId)) {
+        if(IsNil(item) || IsNil(item.artistId) || IsNil(item.albumId)) {
             return null;
         }
 
         // Ensure artist title is valid
-        if(!isDefined(item.artistTitle) || item.artistTitle.length < 1) {
+        if(IsNil(item.artistTitle) || item.artistTitle.length < 1) {
             return null;
         }
 
@@ -51,7 +51,7 @@ export class MetadataBuilder {
         let title = null;
 
         // Retrieve title
-        if(isDefined(item.albumTitle) && item.albumTitle.length >= 1) {
+        if(!IsNil(item.albumTitle) && item.albumTitle.length >= 1) {
             title = item.albumTitle;
         }
 
@@ -70,7 +70,7 @@ export class MetadataBuilder {
     }
 
     buildAlbumArtist(item, fetchedAt) {
-        if(!isDefined(item.albumArtistTitle) || item.albumArtistTitle.length < 1) {
+        if(IsNil(item.albumArtistTitle) || item.albumArtistTitle.length < 1) {
             return null;
         }
 

@@ -1,12 +1,12 @@
 import EventEmitter from 'eventemitter3';
 import Filter from 'lodash-es/filter';
+import IsNil from 'lodash-es/isNil';
 import Map from 'lodash-es/map';
 import Merge from 'lodash-es/merge';
 
 import Extension from 'neon-extension-browser/extension';
 import Log from 'neon-extension-source-googlemusic/core/logger';
 import MetadataParser from 'neon-extension-source-googlemusic/metadata/parser';
-import {isDefined} from 'neon-extension-framework/core/helpers';
 import {createScript} from 'neon-extension-framework/core/helpers/script';
 
 
@@ -15,7 +15,7 @@ export class ShimEvents extends EventEmitter {
         super();
 
        // Ensure body exists
-        if(!isDefined(document.body)) {
+        if(IsNil(document.body)) {
             throw new Error('Body is not available');
         }
 
@@ -73,7 +73,7 @@ export class ShimApi extends EventEmitter {
         }
 
         // Inject shim into page (if not already injecting)
-        if(!isDefined(this._injecting)) {
+        if(IsNil(this._injecting)) {
             this._injecting = this._inject(options);
         }
 
@@ -120,7 +120,7 @@ export class ShimApi extends EventEmitter {
 
             // Create timeout callback
             let timeoutId = setTimeout(() => {
-                if(isDefined(listener)) {
+                if(!IsNil(listener)) {
                     this._events.removeListener(type, listener);
                 }
 

@@ -1,10 +1,10 @@
 import EventEmitter from 'eventemitter3';
+import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
 import ItemBuilder from 'neon-extension-framework/models/item';
 import Log from 'neon-extension-source-googlemusic/core/logger';
 import MetadataBuilder from 'neon-extension-source-googlemusic/metadata/builder';
-import {isDefined} from 'neon-extension-framework/core/helpers';
 
 import PlayerApi from './api';
 import PlayerObserver from './observer';
@@ -51,13 +51,13 @@ export default class PlayerMonitor extends EventEmitter {
         }
 
         // Ensure track exists
-        if(!isDefined(track)) {
+        if(IsNil(track)) {
             this._currentTrack = null;
             return;
         }
 
         // Ensure track has changed
-        if(isDefined(this._currentTrack) && this._currentTrack.matches(track)) {
+        if(!IsNil(this._currentTrack) && this._currentTrack.matches(track)) {
             return;
         }
 
@@ -90,7 +90,7 @@ export default class PlayerMonitor extends EventEmitter {
     // region Private methods
 
     _constructTrack($artist, $album, $track) {
-        if(!isDefined($artist) || !isDefined($track)) {
+        if(IsNil($artist) || IsNil($track)) {
             return null;
         }
 
@@ -121,11 +121,11 @@ export default class PlayerMonitor extends EventEmitter {
         let title = null;
 
         // Retrieve details
-        if(isDefined($album)) {
+        if(!IsNil($album)) {
             id = $album.getAttribute('data-id');
 
             // Retrieve title
-            if(isDefined($album.innerText) && $album.innerText.length >= 1) {
+            if(!IsNil($album.innerText) && $album.innerText.length >= 1) {
                 title = $album.innerText;
             }
         }
@@ -141,7 +141,7 @@ export default class PlayerMonitor extends EventEmitter {
     }
 
     _getId(value) {
-        if(!isDefined(value)) {
+        if(IsNil(value)) {
             return null;
         }
 

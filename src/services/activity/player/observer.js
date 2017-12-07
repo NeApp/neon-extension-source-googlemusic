@@ -1,8 +1,8 @@
 import EventEmitter from 'eventemitter3';
+import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
 import Log from 'neon-extension-source-googlemusic/core/logger';
-import {isDefined} from 'neon-extension-framework/core/helpers';
 
 
 export default class PlayerObserver extends EventEmitter {
@@ -105,7 +105,7 @@ export default class PlayerObserver extends EventEmitter {
     }
 
     _onPlayingInfoChanged(node) {
-        if(!isDefined(node)) {
+        if(IsNil(node)) {
             return;
         }
 
@@ -118,6 +118,6 @@ export default class PlayerObserver extends EventEmitter {
     }
 
     _isHidden(style) {
-        return isDefined(style) && style.indexOf('display: none') >= 0;
+        return !IsNil(style) && style.indexOf('display: none') >= 0;
     }
 }

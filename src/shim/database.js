@@ -1,4 +1,4 @@
-import {isDefined} from 'neon-extension-framework/core/helpers';
+import IsNil from 'lodash-es/isNil';
 
 
 export default class Database {
@@ -9,13 +9,13 @@ export default class Database {
     }
 
     open() {
-        if(!isDefined(window.indexedDB)) {
+        if(IsNil(window.indexedDB)) {
             return Promise.reject(new Error(
                 'IndexedDB API is not available'
             ));
         }
 
-        if(!isDefined(this.userId)) {
+        if(IsNil(this.userId)) {
             return Promise.reject(new Error('' +
                 'Invalid User ID'
             ));
@@ -41,7 +41,7 @@ export default class Database {
     }
 
     all(name) {
-        if(!isDefined(this._db)) {
+        if(IsNil(this._db)) {
             return Promise.reject(new Error(
                 'Database hasn\'t been opened yet'
             ));
@@ -57,7 +57,7 @@ export default class Database {
             store.openCursor().onsuccess = (event) => {
                 let cursor = event.target.result;
 
-                if(isDefined(cursor)) {
+                if(!IsNil(cursor)) {
                     items[cursor.key] = cursor.value;
 
                     // Retrieve next item

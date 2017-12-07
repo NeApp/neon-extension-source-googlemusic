@@ -1,8 +1,7 @@
 /* eslint-disable no-new */
 import Cookie from 'js-cookie';
 import EventEmitter from 'eventemitter3';
-
-import {isDefined} from 'neon-extension-framework/core/helpers';
+import IsNil from 'lodash-es/isNil';
 
 import Database from './database';
 
@@ -12,7 +11,7 @@ export class ShimRequests extends EventEmitter {
         super();
 
         // Ensure body exists
-        if(!isDefined(document.body)) {
+        if(IsNil(document.body)) {
             throw new Error('Body is not available');
         }
 
@@ -125,7 +124,7 @@ export class Shim {
     }
 
     _parseUser(value) {
-        if(!isDefined(value)) {
+        if(IsNil(value)) {
             return null;
         }
 

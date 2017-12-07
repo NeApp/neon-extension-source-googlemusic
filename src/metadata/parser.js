@@ -1,7 +1,6 @@
 /* eslint-disable no-multi-spaces, key-spacing */
+import IsNil from 'lodash-es/isNil';
 import Map from 'lodash-es/map';
-
-import {isDefined} from 'neon-extension-framework/core/helpers';
 
 import Album from './models/album';
 import Track from './models/track';
@@ -48,7 +47,7 @@ const PropertiesByModel = {
 
 export default class MetadataParser {
     static fromJsArray(type, data) {
-        if(!isDefined(Models[type]) || !isDefined(PropertiesByModel[type])) {
+        if(IsNil(Models[type]) || IsNil(PropertiesByModel[type])) {
             throw new Error('Unsupported model type: ' + type);
         }
 
@@ -62,12 +61,12 @@ export default class MetadataParser {
 
             let descriptor = PropertiesByModel[type][key];
 
-            if(descriptor.index >= data.length && (!isDefined(descriptor.optional) || descriptor.optional === false)) {
+            if(descriptor.index >= data.length && (IsNil(descriptor.optional) || descriptor.optional === false)) {
                 throw new Error('No item available at index: ' + descriptor.index);
             }
 
             // Retrieve property value
-            if(isDefined(descriptor.model)) {
+            if(!IsNil(descriptor.model)) {
                 if(descriptor.type === 'list') {
                     values[key] = Map(
                         data[descriptor.index],
