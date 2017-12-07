@@ -1,8 +1,7 @@
-import PickBy from 'lodash-es/pickBy';
 import IsNil from 'lodash-es/isNil';
 
-import ItemBuilder from 'neon-extension-framework/models/item';
 import Plugin from 'neon-extension-source-googlemusic/core/plugin';
+import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
 
 
 export class MetadataBuilder {
@@ -19,35 +18,39 @@ export class MetadataBuilder {
         let fetchedAt = Date.now();
 
         // Artist
-        let artist = {
-            title: item.artistTitle,
-            fetchedAt,
-
-            ids: this.createIds({
+        let artist = Artist.create(Plugin.id, {
+            keys: {
                 id: item.artistId
-            })
-        };
+            },
 
-        // Create track
-        return ItemBuilder.createTrack({
+            // Metadata
+            title: item.artistTitle,
+
+            // Timestamps
+            fetchedAt
+        });
+
+        // Track
+        return Track.create(Plugin.id, {
+            keys: {
+                id: item.trackId
+            },
+
+            // Metadata
             title: item.title,
 
             number: item.number,
             duration: item.duration,
 
-            fetchedAt,
-
-            ids: this.createIds({
-                id: item.trackId
-            }),
-
-            // Children
-            album: this.buildAlbum(item, artist, fetchedAt),
+            // Timestamps
+            fetchedAt
+        }, {
+            album: this.createAlbum(item, artist, fetchedAt),
             artist
         });
     }
 
-    buildAlbum(item, artist, fetchedAt) {
+    createAlbum(item, artist, fetchedAt) {
         let title = null;
 
         // Retrieve title
@@ -56,45 +59,34 @@ export class MetadataBuilder {
         }
 
         // Build album
-        return {
-            title,
-            fetchedAt,
-
-            ids: this.createIds({
+        return Album.create(Plugin.id, {
+            keys: {
                 id: item.albumId
-            }),
+            },
 
-            // Children
-            artist: this.buildAlbumArtist(item, fetchedAt) || artist
-        };
+            // Metadata
+            title,
+
+            // Timestamps
+            fetchedAt
+        }, {
+            artist: this.createAlbumArtist(item, fetchedAt) || artist
+        });
     }
 
-    buildAlbumArtist(item, fetchedAt) {
+    createAlbumArtist(item, fetchedAt) {
         if(IsNil(item.albumArtistTitle) || item.albumArtistTitle.length < 1) {
             return null;
         }
 
         // Build album artist
-        return {
+        return Artist.create(Plugin.id, {
+            // Metadata
             title: item.albumArtistTitle,
+
+            // Timestamps
             fetchedAt
-        };
-    }
-
-    createIds(values) {
-        values = PickBy(values, (value) => isDefined(value) && value.length > 0);
-
-        // Ensure identifiers exist
-        if(Object.keys(values) < 1) {
-            return {};
-        }
-
-        // Build identifiers object
-        let ids = {};
-
-        ids[Plugin.id] = values;
-
-        return ids;
+        });
     }
 }
 

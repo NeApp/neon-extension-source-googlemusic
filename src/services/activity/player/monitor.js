@@ -2,9 +2,9 @@ import EventEmitter from 'eventemitter3';
 import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
-import ItemBuilder from 'neon-extension-framework/models/item';
 import Log from 'neon-extension-source-googlemusic/core/logger';
 import MetadataBuilder from 'neon-extension-source-googlemusic/metadata/builder';
+import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
 
 import PlayerApi from './api';
 import PlayerObserver from './observer';
@@ -45,7 +45,7 @@ export default class PlayerMonitor extends EventEmitter {
 
         // Try construct track
         try {
-            track = this._constructTrack($artist, $album, $track);
+            track = this._createTrack($artist, $album, $track);
         } catch(e) {
             Log.error('Unable to construct track: %s', e.message, e);
         }
@@ -89,34 +89,22 @@ export default class PlayerMonitor extends EventEmitter {
 
     // region Private methods
 
-    _constructTrack($artist, $album, $track) {
+    _createTrack($artist, $album, $track) {
         if(IsNil($artist) || IsNil($track)) {
             return null;
         }
 
-        // Retrieve paths
-        let artistId = $artist.getAttribute('data-id');
-
-        // Construct artist
-        let artist = {
-            title: $artist.innerText,
-
-            ids: MetadataBuilder.createIds({
-                id: this._getId(artistId)
-            })
-        };
-
-        // Construct track
-        return ItemBuilder.createTrack({
+        // Create track
+        return Track.create(Plugin.id, {
+            // Metadata
             title: $track.innerText,
-
-            // Children
-            album: this._buildAlbum($album),
-            artist
+        }, {
+            album: this._createAlbum($album),
+            artist: this._createArtist($artist)
         });
     }
 
-    _buildAlbum($album) {
+    _createAlbum($album) {
         let id = null;
         let title = null;
 
@@ -130,14 +118,34 @@ export default class PlayerMonitor extends EventEmitter {
             }
         }
 
-        // Build album
-        return {
-            title: title,
-
-            ids: MetadataBuilder.createIds({
+        // Create album
+        return Album.create(Plugin.id, {
+            keys: {
                 id: this._getId(id)
-            })
-        };
+            },
+
+            // Metadata
+            title: title
+        });
+    }
+
+    _createArtist($artist) {
+        let title = null;
+
+        // Retrieve title
+        if(!IsNil($artist.innerText) && $artist.innerText.length >= 1) {
+            title = $artist.innerText;
+        }
+
+        // Create artist
+        return Artist.create(Plugin.id, {
+            keys: {
+                id: this._getId($artist.getAttribute('data-id'))
+            },
+
+            // Metadata
+            title: title,
+        });
     }
 
     _getId(value) {
