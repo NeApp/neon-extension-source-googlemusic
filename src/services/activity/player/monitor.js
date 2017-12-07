@@ -3,7 +3,6 @@ import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
 import Log from 'neon-extension-source-googlemusic/core/logger';
-import MetadataBuilder from 'neon-extension-source-googlemusic/metadata/builder';
 import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
 
 import PlayerApi from './api';
@@ -97,7 +96,7 @@ export default class PlayerMonitor extends EventEmitter {
         // Create track
         return Track.create(Plugin.id, {
             // Metadata
-            title: $track.innerText,
+            title: $track.innerText
         }, {
             album: this._createAlbum($album),
             artist: this._createArtist($artist)
@@ -144,7 +143,7 @@ export default class PlayerMonitor extends EventEmitter {
             },
 
             // Metadata
-            title: title,
+            title: title
         });
     }
 
