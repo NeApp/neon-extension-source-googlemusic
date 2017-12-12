@@ -6,7 +6,7 @@ import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
 
 export class MetadataBuilder {
     createTrack(item) {
-        if(IsNil(item) || IsNil(item.artistId) || IsNil(item.albumId)) {
+        if(IsNil(item)) {
             return null;
         }
 
