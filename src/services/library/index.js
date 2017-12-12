@@ -1,4 +1,5 @@
 import Filter from 'lodash-es/filter';
+import IsNil from 'lodash-es/isNil';
 import Map from 'lodash-es/map';
 
 import LibraryService from 'neon-extension-framework/services/source/library';
@@ -28,23 +29,42 @@ export class GoogleMusicLibraryService extends LibraryService {
         return ShimApi.library().then((items) => {
             Log.debug('Received %d track(s) from library', items.length);
 
-            let failed = 0;
+            let errors = {
+                failed: 0,
+                invalid: 0
+            };
 
             // Create tracks
             let tracks = Filter(
                 Map(items, (item) => {
+                    // Create track
                     try {
-                        return MetadataBuilder.createTrack(item).toPlainObject();
+                        let track = MetadataBuilder.createTrack(item);
+
+                        // Ensure track has been created
+                        if(IsNil(track)) {
+                            Log.trace('Ignoring invalid track: %o', item);
+                            errors.invalid++;
+                            return null;
+                        }
+
+                        // Encode track
+                        return track.toPlainObject();
                     } catch(err) {
-                        failed++;
+                        Log.trace('Unable to create track: %s', err);
+                        errors.failed++;
                         return null;
                     }
                 }),
                 (item) => item !== null
             );
 
-            if(failed > 0) {
-                Log.warn('Unable to create %d track(s)', failed);
+            if(errors.failed > 0) {
+                Log.warn('Unable to create %d track(s)', errors.failed);
+            }
+
+            if(errors.invalid > 0) {
+                Log.warn('Ignored %d invalid track(s)', errors.invalid);
             }
 
             // Emit tracks to background service
