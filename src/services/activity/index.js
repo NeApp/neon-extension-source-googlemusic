@@ -6,10 +6,10 @@ import {Cache} from 'memory-cache';
 import ActivityService, {ActivityEngine} from 'neon-extension-framework/services/source/activity';
 import Log from 'neon-extension-source-googlemusic/core/logger';
 import MetadataApi from 'neon-extension-source-googlemusic/api/metadata';
-import MetadataBuilder from 'neon-extension-source-googlemusic/metadata/builder';
 import Plugin from 'neon-extension-source-googlemusic/core/plugin';
 import Registry from 'neon-extension-framework/core/registry';
 import ShimApi from 'neon-extension-source-googlemusic/api/shim';
+import {Artist} from 'neon-extension-framework/models/item/music';
 import {awaitPage} from 'neon-extension-source-googlemusic/core/helpers';
 import {cleanTitle} from 'neon-extension-framework/core/helpers';
 
@@ -68,9 +68,8 @@ export class GoogleMusicActivityService extends ActivityService {
     }
 
     fetchMetadata(item) {
-        let albumId = Get(item.album.ids, [Plugin.id, 'id']);
+        let albumId = Get(item.album.keys, [Plugin.id, 'id']);
 
-        // Ensure identifier exists
         if(IsNil(albumId)) {
             return Promise.resolve(item);
         }
@@ -78,23 +77,32 @@ export class GoogleMusicActivityService extends ActivityService {
         let fetchedAt = Date.now();
 
         // Update item `fetchedAt` timestamp
-        item.update({ fetchedAt });
+        item.update(Plugin.id, { fetchedAt });
 
         // Fetch album metadata
-        Log.debug('Fetching metadata for item: %o', item);
+        Log.debug('Fetching metadata for album "%s" (track: %o)', albumId, item);
 
         return this.fetchAlbum(albumId).then((album) => {
             // Update album
-            item.album.update({
-                fetchedAt,
+            item.album.update(Plugin.id, {
+                fetchedAt
+            });
 
-                artist: {
-                    title: album.artistTitle,
+            // Create album artist
+            if(IsNil(item.album.artist)) {
+                item.album.artist = new Artist();
+            }
 
-                    ids: MetadataBuilder.createIds({
-                        id: album.artistId
-                    })
-                }
+            item.album.artist.update(Plugin.id, {
+                keys: {
+                    id: album.artistId
+                },
+
+                // Metadata
+                title: album.artistTitle,
+
+                // Timestamps
+                fetchedAt
             });
 
             // Clean item title (for matching)
@@ -113,11 +121,12 @@ export class GoogleMusicActivityService extends ActivityService {
             }
 
             // Update item
-            item.update({
-                ids: MetadataBuilder.createIds({
+            item.update(Plugin.id, {
+                keys: {
                     id: track.id
-                }),
+                },
 
+                // Metadata
                 number: track.number,
                 duration: track.duration
             });

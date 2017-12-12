@@ -3,6 +3,7 @@ import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
 import Log from 'neon-extension-source-googlemusic/core/logger';
+import Plugin from 'neon-extension-source-googlemusic/core/plugin';
 import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
 
 import PlayerApi from './api';
@@ -46,11 +47,17 @@ export default class PlayerMonitor extends EventEmitter {
         try {
             track = this._createTrack($artist, $album, $track);
         } catch(e) {
-            Log.error('Unable to construct track: %s', e.message, e);
+            Log.error('Unable to create track: %s', e.message, e);
         }
 
         // Ensure track exists
         if(IsNil(track)) {
+            Log.warn('Unable to parse track: %o', {
+                artist: $artist.innerText,
+                album: $album.innerText,
+                track: $track.innerText
+            });
+
             this._currentTrack = null;
             return;
         }
