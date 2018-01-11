@@ -43,8 +43,9 @@ export class MetadataBuilder {
             duration: item.duration,
 
             // Timestamps
-            fetchedAt
-        }, {
+            fetchedAt,
+
+            // Children
             album: this.createAlbum(item, artist, fetchedAt),
             artist
         });
@@ -68,8 +69,9 @@ export class MetadataBuilder {
             title,
 
             // Timestamps
-            fetchedAt
-        }, {
+            fetchedAt,
+
+            // Children
             artist: this.createAlbumArtist(item, fetchedAt) || artist
         });
     }

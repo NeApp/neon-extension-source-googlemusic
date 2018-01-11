@@ -103,8 +103,9 @@ export default class PlayerMonitor extends EventEmitter {
         // Create track
         return Track.create(Plugin.id, {
             // Metadata
-            title: $track.innerText
-        }, {
+            title: $track.innerText,
+
+            // Children
             album: this._createAlbum($album),
             artist: this._createArtist($artist)
         });
