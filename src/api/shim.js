@@ -14,7 +14,7 @@ export class ShimEvents extends EventEmitter {
     constructor() {
         super();
 
-       // Ensure body exists
+        // Ensure body exists
         if(IsNil(document.body)) {
             throw new Error('Body is not available');
         }
