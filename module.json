@@ -26,11 +26,9 @@
 
   "services": [
     "configuration",
-    "migrate",
 
     "source/activity",
-    "source/library",
-    "source/sync"
+    "source/library"
   ],
   "web_accessible_resources": [
     "source/googlemusic/shim/shim.js"
