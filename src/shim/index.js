@@ -1,4 +1,4 @@
-/* eslint-disable no-new */
+/* eslint-disable no-console, no-new */
 import Cookie from 'js-cookie';
 import EventEmitter from 'eventemitter3';
 import IsNil from 'lodash-es/isNil';
