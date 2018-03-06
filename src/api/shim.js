@@ -82,29 +82,26 @@ export class ShimApi extends EventEmitter {
     }
 
     configuration() {
-        // Ensure shim has been injected
-        return this.inject()
-            // Request configuration
-            .then(() => this._request('configuration'));
+        return this.inject().then(() =>
+            this._request('configuration')
+        );
     }
 
     library() {
-        // Ensure shim has been injected
-        return this.inject()
+        return this.inject().then(() =>
             // Request tracks from library
-            .then(() => this._request('library'))
-            // Parse tracks
-            .then((tracks) => Filter(
-                Map(tracks, (item) => {
+            this._request('library').then((tracks) =>
+                // Parse tracks
+                Filter(Map(tracks, (item) => {
                     try {
                         return MetadataParser.fromJsArray('track', item);
                     } catch(err) {
                         Log.warn('Unable to parse track: %s', err && err.message, item, err);
                         return null;
                     }
-                }),
-                (track) => track !== null
-            ));
+                }), (track) => track !== null)
+            )
+        );
     }
 
     // region Private methods
