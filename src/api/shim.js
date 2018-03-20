@@ -3,8 +3,8 @@ import Filter from 'lodash-es/filter';
 import IsNil from 'lodash-es/isNil';
 import Map from 'lodash-es/map';
 import Merge from 'lodash-es/merge';
+import Runtime from 'wes/runtime';
 
-import Extension from 'neon-extension-browser/extension';
 import Log from 'neon-extension-source-googlemusic/core/logger';
 import MetadataParser from 'neon-extension-source-googlemusic/metadata/parser';
 import {createScript} from 'neon-extension-framework/core/helpers/script';
@@ -171,7 +171,7 @@ export class ShimApi extends EventEmitter {
         }, options || {});
 
         return new Promise((resolve, reject) => {
-            let script = createScript(document, Extension.getUrl('/source/googlemusic/shim/shim.js'));
+            let script = createScript(document, Runtime.getURL('/source/googlemusic/shim/shim.js'));
 
             // Create events interface
             this._events = new ShimEvents();
