@@ -4,15 +4,15 @@
   "content_scripts": [
     {
       "id": "main",
+
       "conditions": [
-        {
-          "pattern": "*://play.google.com/music/*",
-          "pageUrl": {
-            "hostEquals": "play.google.com",
-            "pathPrefix": "/music"
-          }
-        }
+        { "pageUrl": { "hostEquals": "play.google.com",  "pathPrefix": "/music" } }
       ],
+
+      "matches": [
+        "*://play.google.com/music/*"
+      ],
+
       "js": [
         "common.js",
         "source/common.js",
