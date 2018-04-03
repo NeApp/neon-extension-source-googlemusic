@@ -3,6 +3,7 @@ import URI from 'urijs';
 
 import Log from 'neon-extension-source-googlemusic/core/logger';
 import MetadataParser from 'neon-extension-source-googlemusic/metadata/parser';
+import {fetch} from 'neon-extension-framework/core/fetch';
 
 import ShimApi from './shim';
 
