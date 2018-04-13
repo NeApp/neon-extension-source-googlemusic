@@ -18,9 +18,6 @@
     "type": "git",
     "url": "https://github.com/NeApp/neon-extension-source-googlemusic"
   },
-  "scripts": {
-    "test": "echo No tests available yet."
-  },
   "dependencies": {
     "js-cookie": "2.1.4",
     "memory-cache": "0.2.0"
@@ -45,5 +42,8 @@
     "neon-extension-framework": "^1.8.0",
     "urijs": "^1.18.2",
     "wes": "^1.0.0"
+  },
+  "scripts": {
+    "test": "echo No tests available yet."
   }
 }
