@@ -3,8 +3,8 @@ import Plugin from 'neon-extension-source-googlemusic/core/plugin';
 
 
 export default [
-    new Page(Plugin, null, Plugin.title, [
-        new EnableOption(Plugin, 'enabled', 'Enabled', {
+    new Page(Plugin, null, [
+        new EnableOption(Plugin, 'enabled', {
             default: false,
 
             type: 'plugin',
