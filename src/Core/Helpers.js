@@ -1,5 +1,5 @@
-import Log from 'neon-extension-source-googlemusic/core/logger';
-import {awaitBody, awaitElements} from 'neon-extension-framework/document/await';
+import Log from 'neon-extension-source-googlemusic/Core/Logger';
+import {awaitBody, awaitElements} from 'neon-extension-framework/Document/Await';
 
 
 export function awaitPage() {

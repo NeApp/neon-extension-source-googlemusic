@@ -2,12 +2,12 @@ import EventEmitter from 'eventemitter3';
 import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
-import Log from 'neon-extension-source-googlemusic/core/logger';
-import Plugin from 'neon-extension-source-googlemusic/core/plugin';
-import {Artist, Album, Track} from 'neon-extension-framework/models/item/music';
+import Log from 'neon-extension-source-googlemusic/Core/Logger';
+import Plugin from 'neon-extension-source-googlemusic/Core/Plugin';
+import {Artist, Album, Track} from 'neon-extension-framework/Models/Metadata/Music';
 
-import PlayerApi from './api';
-import PlayerObserver from './observer';
+import PlayerApi from './PlayerApi';
+import PlayerObserver from './PlayerObserver';
 
 
 export default class PlayerMonitor extends EventEmitter {

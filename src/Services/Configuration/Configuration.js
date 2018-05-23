@@ -1,6 +1,6 @@
-import ConfigurationService from 'neon-extension-framework/services/configuration';
-import Plugin from 'neon-extension-source-googlemusic/core/plugin';
-import Registry from 'neon-extension-framework/core/registry';
+import ConfigurationService from 'neon-extension-framework/Services/Configuration';
+import Plugin from 'neon-extension-source-googlemusic/Core/Plugin';
+import Registry from 'neon-extension-framework/Core/Registry';
 
 import Options from './options';
 

@@ -1,11 +1,11 @@
 import IsNil from 'lodash-es/isNil';
 import URI from 'urijs';
 
-import Log from 'neon-extension-source-googlemusic/core/logger';
-import MetadataParser from 'neon-extension-source-googlemusic/metadata/parser';
-import {fetch} from 'neon-extension-framework/core/fetch';
+import Log from 'neon-extension-source-googlemusic/Core/Logger';
+import MetadataParser from 'neon-extension-source-googlemusic/Metadata/Parser';
+import {fetch} from 'neon-extension-framework/Core/Fetch';
 
-import ShimApi from './shim';
+import ShimApi from './Shim';
 
 
 const BaseUrl = 'https://play.google.com/music/';

@@ -3,17 +3,17 @@ import Get from 'lodash-es/get';
 import IsNil from 'lodash-es/isNil';
 import {Cache} from 'memory-cache';
 
-import ActivityService, {ActivityEngine} from 'neon-extension-framework/services/source/activity';
-import Log from 'neon-extension-source-googlemusic/core/logger';
-import MetadataApi from 'neon-extension-source-googlemusic/api/metadata';
-import Plugin from 'neon-extension-source-googlemusic/core/plugin';
-import Registry from 'neon-extension-framework/core/registry';
-import ShimApi from 'neon-extension-source-googlemusic/api/shim';
-import {Artist} from 'neon-extension-framework/models/item/music';
-import {awaitPage} from 'neon-extension-source-googlemusic/core/helpers';
-import {cleanTitle} from 'neon-extension-framework/core/helpers';
+import ActivityService, {ActivityEngine} from 'neon-extension-framework/Services/Source/Activity';
+import Log from 'neon-extension-source-googlemusic/Core/Logger';
+import MetadataApi from 'neon-extension-source-googlemusic/Api/Metadata';
+import Plugin from 'neon-extension-source-googlemusic/Core/Plugin';
+import Registry from 'neon-extension-framework/Core/Registry';
+import ShimApi from 'neon-extension-source-googlemusic/Api/Shim';
+import {Artist} from 'neon-extension-framework/Models/Metadata/Music';
+import {awaitPage} from 'neon-extension-source-googlemusic/Core/Helpers';
+import {cleanTitle} from 'neon-extension-framework/Utilities/Metadata';
 
-import PlayerMonitor from './player/monitor';
+import {PlayerMonitor} from './Player';
 
 
 const AlbumCacheExpiry = 3 * 60 * 60 * 1000;  // 3 hours

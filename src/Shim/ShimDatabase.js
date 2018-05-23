@@ -1,7 +1,7 @@
 import IsNil from 'lodash-es/isNil';
 
 
-export default class Database {
+export default class ShimDatabase {
     constructor(userId) {
         this.userId = userId;
 

@@ -2,8 +2,8 @@
 import IsNil from 'lodash-es/isNil';
 import Map from 'lodash-es/map';
 
-import Album from './models/album';
-import Track from './models/track';
+import Album from './Models/Album';
+import Track from './Models/Track';
 
 
 const Models = {

@@ -2,13 +2,13 @@ import Filter from 'lodash-es/filter';
 import IsNil from 'lodash-es/isNil';
 import Map from 'lodash-es/map';
 
-import LibraryService from 'neon-extension-framework/services/source/library';
-import Log from 'neon-extension-source-googlemusic/core/logger';
-import MetadataBuilder from 'neon-extension-source-googlemusic/metadata/builder';
-import Plugin from 'neon-extension-source-googlemusic/core/plugin';
-import Registry from 'neon-extension-framework/core/registry';
-import ShimApi from 'neon-extension-source-googlemusic/api/shim';
-import {awaitPage} from 'neon-extension-source-googlemusic/core/helpers';
+import LibraryService from 'neon-extension-framework/Services/Source/Library';
+import Log from 'neon-extension-source-googlemusic/Core/Logger';
+import MetadataBuilder from 'neon-extension-source-googlemusic/Metadata/Builder';
+import Plugin from 'neon-extension-source-googlemusic/Core/Plugin';
+import Registry from 'neon-extension-framework/Core/Registry';
+import ShimApi from 'neon-extension-source-googlemusic/Api/Shim';
+import {awaitPage} from 'neon-extension-source-googlemusic/Core/Helpers';
 
 
 export class GoogleMusicLibraryService extends LibraryService {

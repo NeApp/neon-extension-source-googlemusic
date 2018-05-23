@@ -1,9 +1,9 @@
-/* eslint-disable no-console, no-new */
+/* eslint-disable no-console */
 import Cookie from 'js-cookie';
 import EventEmitter from 'eventemitter3';
 import IsNil from 'lodash-es/isNil';
 
-import Database from './database';
+import ShimDatabase from './ShimDatabase';
 
 
 export class ShimRequests extends EventEmitter {
@@ -52,7 +52,7 @@ export class ShimRequests extends EventEmitter {
     }
 }
 
-export class Shim {
+export default class Shim {
     constructor() {
         this.requests = new ShimRequests();
         this.requests.on('configuration', () => this.configuration());
@@ -81,7 +81,7 @@ export class Shim {
     }
 
     library() {
-        let db = new Database(this.userId);
+        let db = new ShimDatabase(this.userId);
 
         // Fetch tracks from library
         Promise.resolve()
@@ -137,6 +137,3 @@ export class Shim {
 
     // endregion
 }
-
-// Construct shim
-(new Shim());

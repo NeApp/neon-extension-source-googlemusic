@@ -14,9 +14,9 @@
       ],
 
       "js": [
-        "common.js",
-        "source/common.js",
-        "source/googlemusic/googlemusic.js"
+        "Common.js",
+        "Modules/Common.js",
+        "Modules/neon-extension-source-googlemusic/Main.js"
       ]
     }
   ],
@@ -31,12 +31,12 @@
     "source/library"
   ],
   "web_accessible_resources": [
-    "source/googlemusic/shim/shim.js"
+    "Modules/neon-extension-source-googlemusic/Shim.js"
   ],
 
   "webpack": {
-    "modules": [
-      "shim"
-    ]
+    "modules": {
+      "Shim": { "entry": true }
+    }
   }
 }

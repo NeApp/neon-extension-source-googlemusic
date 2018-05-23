@@ -5,9 +5,9 @@ import Map from 'lodash-es/map';
 import Merge from 'lodash-es/merge';
 import Runtime from 'wes/runtime';
 
-import Log from 'neon-extension-source-googlemusic/core/logger';
-import MetadataParser from 'neon-extension-source-googlemusic/metadata/parser';
-import {createScript} from 'neon-extension-framework/core/helpers/script';
+import Log from 'neon-extension-source-googlemusic/Core/Logger';
+import MetadataParser from 'neon-extension-source-googlemusic/Metadata/Parser';
+import {createScript} from 'neon-extension-framework/Utilities/Script';
 
 
 export class ShimEvents extends EventEmitter {
@@ -171,7 +171,7 @@ export class ShimApi extends EventEmitter {
         }, options || {});
 
         return new Promise((resolve, reject) => {
-            let script = createScript(document, Runtime.getURL('/source/googlemusic/shim/shim.js'));
+            let script = createScript(document, Runtime.getURL('/Modules/neon-extension-source-googlemusic/Shim.js'));
 
             // Create events interface
             this._events = new ShimEvents();
