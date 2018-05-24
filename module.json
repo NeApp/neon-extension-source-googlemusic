@@ -25,10 +25,9 @@
   ],
 
   "services": [
-    "configuration",
-
-    "source/activity",
-    "source/library"
+    "Configuration",
+    "Source:Activity",
+    "Source:Library"
   ],
   "web_accessible_resources": [
     "Modules/neon-extension-source-googlemusic/Shim.js"
