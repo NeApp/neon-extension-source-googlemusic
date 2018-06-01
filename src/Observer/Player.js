@@ -2,7 +2,7 @@
 import Debounce from 'lodash-es/debounce';
 import IsEqual from 'lodash-es/isEqual';
 
-import Log from 'neon-extension-source-amazonvideo/Core/Logger';
+import Log from 'neon-extension-source-googlemusic/Core/Logger';
 
 import Observer from './Base';
 
