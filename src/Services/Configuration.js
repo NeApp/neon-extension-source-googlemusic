@@ -2,7 +2,8 @@ import ConfigurationService from 'neon-extension-framework/Services/Configuratio
 import Plugin from 'neon-extension-source-googlemusic/Core/Plugin';
 import Registry from 'neon-extension-framework/Core/Registry';
 import {Page} from 'neon-extension-framework/Models/Configuration';
-import {EnableOption} from 'neon-extension-framework/Models/Configuration/Options'
+import {EnableOption} from 'neon-extension-framework/Models/Configuration/Options';
+
 
 export const Options = [
     new Page(Plugin, null, [
