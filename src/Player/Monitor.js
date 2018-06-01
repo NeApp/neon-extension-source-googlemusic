@@ -1,13 +1,14 @@
+/* eslint-disable no-multi-spaces, key-spacing */
 import EventEmitter from 'eventemitter3';
 import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
 import Log from 'neon-extension-source-googlemusic/Core/Logger';
 import Plugin from 'neon-extension-source-googlemusic/Core/Plugin';
+import PlayerObserver from 'neon-extension-source-googlemusic/Observer/Player';
 import {Artist, Album, Track} from 'neon-extension-framework/Models/Metadata/Music';
 
-import PlayerApi from './PlayerApi';
-import PlayerObserver from './PlayerObserver';
+import PlayerApi from './Api';
 
 
 export default class PlayerMonitor extends EventEmitter {
@@ -19,70 +20,71 @@ export default class PlayerMonitor extends EventEmitter {
             progressInterval: 5000
         }, options);
 
+        // Private attributes
+        this._currentItem = null;
+        this._progressEmitterEnabled = false;
+
         // Construct api client
         this.api = new PlayerApi();
 
-        // Construct observer
-        this.observer = new PlayerObserver();
-        this.observer.on('queue.created', this._onQueueCreated.bind(this));
-        this.observer.on('queue.destroyed', this._onQueueDestroyed.bind(this));
-        this.observer.on('track.changed', this._onTrackChanged.bind(this));
+        // Bind to player events
+        PlayerObserver.on('track.changed',   this.onTrackChanged.bind(this));
 
-        // Private attributes
-        this._currentTrack = null;
-        this._progressEmitterEnabled = false;
+        PlayerObserver.on('queue.created',   this.onQueueCreated.bind(this));
+        PlayerObserver.on('queue.destroyed', this.onQueueDestroyed.bind(this));
     }
 
-    bind(document) {
-        return this.observer.bind(document)
-            .then(() => this.api.bind(document));
+    start() {
+        // Bind player api to page
+        this.api.bind();
+
+        // Start observing player
+        PlayerObserver.start();
     }
 
     // region Event handlers
 
-    _onTrackChanged($artist, $album, $track) {
+    onTrackChanged({ previous, current }) {
+        Log.trace('PlayerMonitor.onTrackChanged: %o -> %o', previous, current);
+
         let track = null;
 
         // Try construct track
         try {
-            track = this._createTrack($artist, $album, $track);
+            track = this._createTrack(current);
         } catch(e) {
             Log.error('Unable to create track: %s', e.message || e);
         }
 
         // Ensure track exists
         if(IsNil(track)) {
-            Log.warn('Unable to parse track: %o', {
-                artist: $artist.innerText,
-                album: $album.innerText,
-                track: $track.innerText
-            });
+            Log.warn('Unable to parse track: %o', current);
 
-            this._currentTrack = null;
+            this._currentItem = null;
             return;
         }
 
         // Ensure track has changed
-        if(!IsNil(this._currentTrack) && this._currentTrack.matches(track)) {
+        if(!IsNil(this._currentItem) && this._currentItem.matches(track)) {
             return;
         }
 
         // Update current identifier
-        this._currentTrack = track;
+        this._currentItem = track;
 
         // Emit "created" event
         this.emit('created', track);
     }
 
-    _onQueueCreated() {
-        Log.debug('Queue created');
+    onQueueCreated() {
+        Log.trace('PlayerMonitor.onQueueCreated');
 
         // Start progress emitter
         this._startProgressEmitter();
     }
 
-    _onQueueDestroyed() {
-        Log.debug('Queue destroyed');
+    onQueueDestroyed() {
+        Log.trace('PlayerMonitor.onQueueDestroyed');
 
         // Stop progress emitter
         this._progressEmitterEnabled = false;
@@ -95,34 +97,26 @@ export default class PlayerMonitor extends EventEmitter {
 
     // region Private methods
 
-    _createTrack($artist, $album, $track) {
-        if(IsNil($artist) || IsNil($track)) {
+    _createTrack({ title, artist, album }) {
+        if(IsNil(artist) || IsNil(title)) {
             return null;
         }
 
         // Create track
         return Track.create(Plugin.id, {
             // Metadata
-            title: $track.innerText,
+            title,
 
             // Children
-            album: this._createAlbum($album),
-            artist: this._createArtist($artist)
+            album: this._createAlbum(album),
+            artist: this._createArtist(artist)
         });
     }
 
-    _createAlbum($album) {
-        let id = null;
-        let title = null;
-
-        // Retrieve details
-        if(!IsNil($album)) {
-            id = $album.getAttribute('data-id');
-
-            // Retrieve title
-            if(!IsNil($album.innerText) && $album.innerText.length >= 1) {
-                title = $album.innerText;
-            }
+    _createAlbum({ id, title }) {
+        if(IsNil(title)) {
+            id = null;
+            title = null;
         }
 
         // Create album
@@ -132,26 +126,24 @@ export default class PlayerMonitor extends EventEmitter {
             },
 
             // Metadata
-            title: title
+            title
         });
     }
 
-    _createArtist($artist) {
-        let title = null;
-
-        // Retrieve title
-        if(!IsNil($artist.innerText) && $artist.innerText.length >= 1) {
-            title = $artist.innerText;
+    _createArtist({ id, title }) {
+        if(IsNil(title)) {
+            id = null;
+            title = null;
         }
 
         // Create artist
         return Artist.create(Plugin.id, {
             keys: {
-                id: this._getId($artist.getAttribute('data-id'))
+                id: this._getId(id)
             },
 
             // Metadata
-            title: title
+            title
         });
     }
 

@@ -7,13 +7,12 @@ import ActivityService, {ActivityEngine} from 'neon-extension-framework/Services
 import Log from 'neon-extension-source-googlemusic/Core/Logger';
 import MetadataApi from 'neon-extension-source-googlemusic/Api/Metadata';
 import Plugin from 'neon-extension-source-googlemusic/Core/Plugin';
+import PlayerMonitor from 'neon-extension-source-googlemusic/Player/Monitor';
 import Registry from 'neon-extension-framework/Core/Registry';
 import ShimApi from 'neon-extension-source-googlemusic/Api/Shim';
 import {Artist} from 'neon-extension-framework/Models/Metadata/Music';
 import {awaitPage} from 'neon-extension-source-googlemusic/Core/Helpers';
 import {cleanTitle} from 'neon-extension-framework/Utilities/Metadata';
-
-import {PlayerMonitor} from './Player';
 
 
 const AlbumCacheExpiry = 3 * 60 * 60 * 1000;  // 3 hours
@@ -22,8 +21,8 @@ export class GoogleMusicActivityService extends ActivityService {
     constructor() {
         super(Plugin);
 
+        this.player = new PlayerMonitor();
         this.engine = null;
-        this.monitor = null;
 
         this.albums = new Cache();
 
@@ -42,29 +41,19 @@ export class GoogleMusicActivityService extends ActivityService {
 
             isEnabled: () => true
         });
-    }
 
-    bind() {
-        // Initialize player monitor
-        this.monitor = new PlayerMonitor();
+        // Bind activity engine to player monitor
+        this.engine.bind(this.player);
 
-        // Bind activity engine to monitor
-        this.engine.bind(this.monitor);
+        // Inject shim
+        return ShimApi.inject().then((configuration) => {
+            Log.trace('Configuration received');
 
-        // Bind player monitor to page
-        return ShimApi.inject()
-            .then((configuration) => {
-                Log.trace('Configuration received');
-
-                // Initialize API clients
-                MetadataApi.initialize(configuration);
-
-                // Bind player monitor to page
-                return this.monitor.bind(document);
-            })
-            .catch((err) => {
-                Log.error('Unable to inject shim: %s', err.message, err);
-            });
+            // Initialize API clients
+            MetadataApi.initialize(configuration);
+        }).catch((err) => {
+            Log.error('Unable to inject shim: %s', err.message, err);
+        });
     }
 
     fetchMetadata(item) {
@@ -164,9 +153,9 @@ export class GoogleMusicActivityService extends ActivityService {
 
         Log.trace('Library update finished');
 
-        // Bind once page has loaded
+        // Start monitoring player once page has loaded
         awaitPage().then(() =>
-            this.bind()
+            this.player.start()
         );
     }
 

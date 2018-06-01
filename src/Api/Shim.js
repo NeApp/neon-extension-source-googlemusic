@@ -7,6 +7,7 @@ import Runtime from 'wes/runtime';
 
 import Log from 'neon-extension-source-googlemusic/Core/Logger';
 import MetadataParser from 'neon-extension-source-googlemusic/Metadata/Parser';
+import {awaitBody} from 'neon-extension-framework/Document/Await';
 import {createScript} from 'neon-extension-framework/Utilities/Script';
 
 
@@ -170,35 +171,33 @@ export class ShimApi extends EventEmitter {
             timeout: 10 * 1000  // 10 seconds
         }, options || {});
 
-        return new Promise((resolve, reject) => {
+        // Wait until body is available
+        return awaitBody().then(() => {
             let script = createScript(document, Runtime.getURL('/Modules/neon-extension-source-googlemusic/Shim.js'));
 
             // Create events interface
             this._events = new ShimEvents();
 
+            // Insert script into page
+            (document.head || document.documentElement).appendChild(script);
+
             // Wait for "configuration" event
-            this._await('configuration', {
+            return this._await('configuration', {
                 timeout: options.timeout
             }).then((configuration) => {
                 // Update state
                 this._configuration = configuration;
-
                 this._injected = true;
                 this._injecting = null;
-
-                // Resolve promise
-                resolve(configuration);
             }, () => {
                 // Update state
+                this._configuration = null;
                 this._injected = false;
                 this._injecting = null;
 
                 // Reject promise
-                reject(new Error('Inject timeout'));
+                return Promise.reject(new Error('Inject timeout'));
             });
-
-            // Insert script into page
-            (document.head || document.documentElement).appendChild(script);
         });
     }
 

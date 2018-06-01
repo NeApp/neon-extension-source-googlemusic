@@ -20,25 +20,24 @@ export default class PlayerApi {
         this._responseCallback = null;
     }
 
-    bind(document) {
-        return new Promise((resolve, reject) => {
-            // Try find the player api element
-            this._node = document.getElementById('player-api');
+    bind() {
+        if(!IsNil(this._node)) {
+            return;
+        }
 
-            if(this._node === null) {
-                reject(new Error('Unable to find the player api element'));
-                return;
-            }
+        // Find player api element
+        this._node = document.getElementById('player-api');
 
-            // Reset state
-            this._responseCallback = null;
+        if(IsNil(this._node)) {
+            throw new Error('Unable to find the player api element');
+        }
 
-            // Bind to "playerApiReturn" events
-            this._node.addEventListener('playerApiReturn', (event) => {
-                this._onResponse(event);
-            });
+        // Reset state
+        this._responseCallback = null;
 
-            resolve();
+        // Bind to "playerApiReturn" events
+        this._node.addEventListener('playerApiReturn', (event) => {
+            this._onResponse(event);
         });
     }
 
