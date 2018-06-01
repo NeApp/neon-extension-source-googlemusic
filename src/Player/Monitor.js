@@ -98,7 +98,7 @@ export default class PlayerMonitor extends EventEmitter {
     // region Private methods
 
     _createTrack({ title, artist, album }) {
-        if(IsNil(artist) || IsNil(title)) {
+        if(IsNil(title) || IsNil(artist.title)) {
             return null;
         }
 
