@@ -1,7 +1,8 @@
 import IsNil from 'lodash-es/isNil';
 
 import {Artist, Album, Track} from 'neon-extension-framework/Models/Metadata/Music';
-import Plugin from 'neon-extension-source-googlemusic/Core/Plugin';
+
+import Plugin from '../Core/Plugin';
 
 
 export class MetadataBuilder {

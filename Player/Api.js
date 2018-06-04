@@ -1,7 +1,7 @@
 import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
-import Log from 'neon-extension-source-googlemusic/Core/Logger';
+import Log from '../Core/Logger';
 
 
 const ResponseKeys = [

@@ -1,10 +1,10 @@
 import IsNil from 'lodash-es/isNil';
 import URI from 'urijs';
 
-import Log from 'neon-extension-source-googlemusic/Core/Logger';
-import MetadataParser from 'neon-extension-source-googlemusic/Metadata/Parser';
 import {fetch} from 'neon-extension-framework/Core/Fetch';
 
+import Log from '../Core/Logger';
+import MetadataParser from '../Metadata/Parser';
 import ShimApi from './Shim';
 
 

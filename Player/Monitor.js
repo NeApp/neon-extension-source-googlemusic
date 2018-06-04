@@ -3,11 +3,11 @@ import EventEmitter from 'eventemitter3';
 import IsNil from 'lodash-es/isNil';
 import Merge from 'lodash-es/merge';
 
-import Log from 'neon-extension-source-googlemusic/Core/Logger';
-import Plugin from 'neon-extension-source-googlemusic/Core/Plugin';
-import PlayerObserver from 'neon-extension-source-googlemusic/Observer/Player';
 import {Artist, Album, Track} from 'neon-extension-framework/Models/Metadata/Music';
 
+import Log from '../Core/Logger';
+import Plugin from '../Core/Plugin';
+import PlayerObserver from '../Observer/Player';
 import PlayerApi from './Api';
 
 

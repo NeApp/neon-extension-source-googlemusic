@@ -5,10 +5,11 @@ import Map from 'lodash-es/map';
 import Merge from 'lodash-es/merge';
 import Runtime from 'wes/runtime';
 
-import Log from 'neon-extension-source-googlemusic/Core/Logger';
-import MetadataParser from 'neon-extension-source-googlemusic/Metadata/Parser';
 import {awaitBody} from 'neon-extension-framework/Document/Await';
 import {createScript} from 'neon-extension-framework/Utilities/Script';
+
+import Log from '../Core/Logger';
+import MetadataParser from '../Metadata/Parser';
 
 
 export class ShimEvents extends EventEmitter {
