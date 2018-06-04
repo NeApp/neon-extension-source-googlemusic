@@ -69,6 +69,11 @@ export default class Shim {
     configuration() {
         let url = new URL(window.location.href);
 
+        if(IsNil(url) || IsNil(url.searchParams)) {
+            console.error('Unable to parse URL: %s', url);
+            return;
+        }
+
         // Emit "configuration" event
         this._emit('configuration', {
             flags: window['FLAGS'],
