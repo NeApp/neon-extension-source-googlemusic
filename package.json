@@ -1,6 +1,6 @@
 {
   "name": "neon-extension-source-googlemusic",
-  "version": "2.0.0-beta.3",
+  "version": "2.0.0-beta.6",
   "description": "Radon Extension: Google Play Music",
   "keywords": [
     "neon",
@@ -60,7 +60,7 @@
     "whatwg-fetch": "^2.0.4"
   },
   "peerDependencies": {
-    "neon-extension-framework": "2.0.0-beta.3"
+    "neon-extension-framework": "^2.0.0-beta"
   },
   "scripts": {
     "lint": "eslint .",
