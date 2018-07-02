@@ -32,7 +32,8 @@ export class PlayerObserver extends Observer {
 
         // Observe song information
         this.info = this.observe(this.body, '#playerSongInfo', { attributes: ['style'] })
-            .onAttributeChanged('style', this.onInfoStyleChanged.bind(this));
+            .onAttributeChanged('style', this.onInfoStyleChanged.bind(this))
+            .on('mutation', this.onInfoStyleChanged.bind(this));
 
         this.content = this.observe(this.info, '.now-playing-info-content');
 
