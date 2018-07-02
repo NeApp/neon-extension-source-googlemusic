@@ -12,7 +12,7 @@ export class PlayerObserver extends Observer {
         super();
 
         // Create debounced `onTrackChanged` function
-        this.onTrackChanged = Debounce(this._onTrackChanged, 2500);
+        this.onTrackChanged = Debounce(this._onTrackChanged, 5000);
 
         this.info = null;
         this.content = null;
