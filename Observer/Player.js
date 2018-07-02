@@ -1,6 +1,7 @@
 /* eslint-disable no-multi-spaces, key-spacing */
 import Debounce from 'lodash-es/debounce';
 import IsEqual from 'lodash-es/isEqual';
+import IsNil from 'lodash-es/isNil';
 
 import Log from '../Core/Logger';
 import Observer from './Base';
@@ -31,7 +32,7 @@ export class PlayerObserver extends Observer {
 
         // Observe song information
         this.info = this.observe(this.body, '#playerSongInfo', { attributes: ['style'] })
-            .onAttributeChanged('style', this.onStyleChanged.bind(this));
+            .onAttributeChanged('style', this.onInfoStyleChanged.bind(this));
 
         this.content = this.observe(this.info, '.now-playing-info-content');
 
@@ -52,17 +53,30 @@ export class PlayerObserver extends Observer {
 
     // region Event Handlers
 
-    onStyleChanged({ node }) {
-        if(node.style.display !== 'none') {
-            // Update state
-            this._queueCreated = true;
+    onInfoStyleChanged() {
+        let node = document.querySelector('#playerSongInfo');
 
-            // Emit "queue.created" event
-            this.emit('queue.created');
+        // Update queue state
+        if(!IsNil(node) && node.style.display !== 'none') {
+            this._onQueueCreated();
+        } else {
+            this._onQueueDestroyed();
+        }
+    }
+
+    _onQueueCreated() {
+        if(this._queueCreated) {
             return;
         }
 
-        // Ensure queue was created
+        // Update state
+        this._queueCreated = true;
+
+        // Emit event
+        this.emit('queue.created');
+    }
+
+    _onQueueDestroyed() {
         if(!this._queueCreated) {
             return;
         }
@@ -70,7 +84,7 @@ export class PlayerObserver extends Observer {
         // Update state
         this._queueCreated = false;
 
-        // Emit "queue.destroyed" event
+        // Emit event
         this.emit('queue.destroyed');
     }
 
