@@ -3,7 +3,7 @@ node_js:
 - '7'
 before_install:
 - npm install -g npm@'^5.10.0'
-- npm install -g NeApp/neon-extension-build#$TRAVIS_BRANCH || npm install -g NeApp/neon-extension-build#develop
+- npm install -g RadonApp/radon-extension-build#$TRAVIS_BRANCH || npm install -g RadonApp/radon-extension-build#develop
 install:
 - neb travis:install $TRAVIS_BRANCH
 - neb package:validate
@@ -21,5 +21,5 @@ deploy:
   api_key:
     secure: bXipTB4nJUImzmErvh6U2Eh3UEhNgAa0WKYfvzej+0lQO1wVMizQXM05v71kCNGki/iKeBvYSM74V2aVxe67VQmgSOXALqVXDnv7h9YuPtqO94q/65ABasBcMuI60BWZBFZArcivJbndUJJgou19lyWlwbzsl1UEL2fWWJxDjLruUFLBbSPrJiOSqpwaVwnThr/MLTeFPDfMnoHfDaTveepRtuLMvRXm8T+OB4JOgPyGU0rTjRf4lu56kQHJpOjZu6XtcYvK6YpbH9LgylLUrYXETa9ezoVq+pAXPaKEYjr0IwEl8G/V38ttqzEu+oKEvD2DFEqBD0aZ8GAjCK/ltLPDqimHOvYa7o2WXpwUrpZR2oYlPX/eWLRSJNGBiybwpZk+WC3HZe4F0LdwJMY3SuwkW61Qs3UFqEuyQ+2HJNSJ+Xp4FTSYC96ETvcvSCVAV0O2BM4E/CbczKjhR/7BLpw4TB/deb/HST9HJZo5ibSsfCWpUwYqBkHxig+5evTOy0f8JwQ60fR5+XOROG3TWTPt1B3j8cYSJXko0WMwRwGXFIfDqaBTwqC1JcuBeK2Vs3H7Uu6xm/FkIkRdlr3WMjp3G+DbNHXS3EAWyBEy/tPOBWwSsWPBDb7L4cwBQVkEiH4WWRFNglCtU/uk8el297f9qBENzNOHilgC7y58AjE=
   on:
-    repo: NeApp/neon-extension-source-googlemusic
+    repo: RadonApp/radon-extension-plugin-googlemusic
     tags: true

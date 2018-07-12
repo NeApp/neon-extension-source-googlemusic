@@ -2,8 +2,8 @@ import Filter from 'lodash-es/filter';
 import IsNil from 'lodash-es/isNil';
 import Map from 'lodash-es/map';
 
-import LibraryService from 'neon-extension-framework/Services/Source/Library';
-import Registry from 'neon-extension-framework/Core/Registry';
+import LibraryService from '@radon-extension/framework/Services/Source/Library';
+import Registry from '@radon-extension/framework/Core/Registry';
 
 import Log from '../Core/Logger';
 import MetadataBuilder from '../Metadata/Builder';

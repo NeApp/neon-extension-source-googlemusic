@@ -1,4 +1,4 @@
-import {awaitBody, awaitElements} from 'neon-extension-framework/Document/Await';
+import {awaitBody, awaitElements} from '@radon-extension/framework/Document/Await';
 
 import Log from './Logger';
 

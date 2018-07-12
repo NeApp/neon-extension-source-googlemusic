@@ -1,7 +1,7 @@
 import IsNil from 'lodash-es/isNil';
 import URI from 'urijs';
 
-import {fetch} from 'neon-extension-framework/Core/Fetch';
+import {fetch} from '@radon-extension/framework/Core/Fetch';
 
 import Log from '../Core/Logger';
 import MetadataParser from '../Metadata/Parser';

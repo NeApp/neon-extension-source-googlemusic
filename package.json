@@ -1,22 +1,22 @@
 {
-  "name": "neon-extension-source-googlemusic",
+  "name": "@radon-extension/plugin-googlemusic",
   "version": "2.1.0",
   "description": "Radon Extension: Google Play Music",
   "keywords": [
-    "neon",
-    "neon-extension",
+    "radon",
+    "radon-extension",
     "google-music"
   ],
-  "homepage": "https://github.com/NeApp/neon-extension",
+  "homepage": "https://github.com/RadonApp/radon-extension",
   "author": "Dean Gardiner <me@dgardiner.net>",
   "license": "GPL-3.0",
   "main": "./src",
   "bugs": {
-    "url": "https://github.com/NeApp/neon-extension/issues"
+    "url": "https://github.com/RadonApp/radon-extension/issues"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/NeApp/neon-extension-source-googlemusic"
+    "url": "https://github.com/RadonApp/radon-extension-plugin-googlemusic"
   },
   "dependencies": {
     "eventemitter3": "^2.0.0",
@@ -60,7 +60,7 @@
     "whatwg-fetch": "^2.0.4"
   },
   "peerDependencies": {
-    "neon-extension-framework": "^2.1"
+    "@radon-extension/framework": "^2.1"
   },
   "scripts": {
     "lint": "eslint .",
