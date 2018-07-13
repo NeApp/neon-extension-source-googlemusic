@@ -24,7 +24,7 @@
     "lodash-es": "^4.16.1",
     "memory-cache": "^0.2.0",
     "urijs": "^1.19.1",
-    "wes": "^1.1.0-beta.1"
+    "wes": "^1.1.0-beta.2"
   },
   "devDependencies": {
     "@babel/core": "^7.0.0-beta.49",
