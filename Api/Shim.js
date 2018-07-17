@@ -2,7 +2,6 @@ import EventEmitter from 'eventemitter3';
 import Filter from 'lodash-es/filter';
 import IsNil from 'lodash-es/isNil';
 import Map from 'lodash-es/map';
-import Merge from 'lodash-es/merge';
 import Runtime from 'wes/runtime';
 
 import {awaitBody} from 'neon-extension-framework/Document/Await';
@@ -12,7 +11,9 @@ import Log from '../Core/Logger';
 import MetadataParser from '../Metadata/Parser';
 
 
-export class ShimEvents extends EventEmitter {
+const RequestTimeout = 10 * 1000;
+
+export class GoogleMusicShimEvents extends EventEmitter {
     constructor() {
         super();
 
@@ -53,12 +54,14 @@ export class ShimEvents extends EventEmitter {
             return;
         }
 
-        // Emit request
+        Log.trace('Received "%s" event', event.type);
+
+        // Emit event
         this.emit(event.type, ...event.args);
     }
 }
 
-export class ShimApi extends EventEmitter {
+export class GoogleMusicShim extends EventEmitter {
     constructor() {
         super();
 
@@ -67,6 +70,14 @@ export class ShimApi extends EventEmitter {
 
         this._injected = false;
         this._injecting = null;
+    }
+
+    get injected() {
+        return this._injected;
+    }
+
+    get injecting() {
+        return this._injecting;
     }
 
     inject(options) {
@@ -108,12 +119,7 @@ export class ShimApi extends EventEmitter {
 
     // region Private methods
 
-    _await(type, options) {
-        options = Merge({
-            timeout: 10 * 1000  // 10 seconds
-        }, options || {});
-
-        // Create promise
+    _await(type, callback) {
         return new Promise((resolve, reject) => {
             let listener;
 
@@ -125,7 +131,7 @@ export class ShimApi extends EventEmitter {
 
                 // Reject promise
                 reject(new Error('Request timeout'));
-            }, options.timeout);
+            }, RequestTimeout);
 
             // Create listener callback
             listener = (event) => {
@@ -137,6 +143,11 @@ export class ShimApi extends EventEmitter {
 
             // Wait for event
             this._events.once(type, listener);
+
+            // Fire callback
+            if(!IsNil(callback)) {
+                callback();
+            }
         });
     }
 
@@ -153,39 +164,33 @@ export class ShimApi extends EventEmitter {
     }
 
     _request(type, ...args) {
-        let request = new CustomEvent('neon.request', {
+        let requestEvent = new CustomEvent('neon.request', {
             detail: JSON.stringify({
                 type: type,
                 args: args || []
             })
         });
 
-        // Emit request on the document
-        document.body.dispatchEvent(request);
-
-        // Wait for response
-        return this._await(type);
+        // Emit request, and await response
+        return this._await(type, () => {
+            // Emit request to shim
+            document.body.dispatchEvent(requestEvent);
+        });
     }
 
-    _inject(options) {
-        options = Merge({
-            timeout: 10 * 1000  // 10 seconds
-        }, options || {});
-
+    _inject() {
         // Wait until body is available
         return awaitBody().then(() => {
             let script = createScript(document, Runtime.getURL('/Modules/neon-extension-source-googlemusic/Shim.js'));
 
             // Create events interface
-            this._events = new ShimEvents();
+            this._events = new GoogleMusicShimEvents();
 
             // Insert script into page
             (document.head || document.documentElement).appendChild(script);
 
             // Wait for "configuration" event
-            return this._await('configuration', {
-                timeout: options.timeout
-            }).then((configuration) => {
+            return this._await('configuration').then((configuration) => {
                 // Update state
                 this._configuration = configuration;
                 this._injected = true;
@@ -205,4 +210,4 @@ export class ShimApi extends EventEmitter {
     // endregion
 }
 
-export default new ShimApi();
+export default new GoogleMusicShim();
