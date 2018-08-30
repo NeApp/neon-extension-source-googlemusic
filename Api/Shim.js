@@ -181,7 +181,7 @@ export class GoogleMusicShim extends EventEmitter {
     _inject() {
         // Wait until body is available
         return awaitBody().then(() => {
-            let script = createScript(document, Runtime.getURL('/Modules/neon-extension-source-googlemusic/Shim.js'));
+            let script = createScript(document, Runtime.getURL('/Plugins/googlemusic/Shim.js'));
 
             // Create events interface
             this._events = new GoogleMusicShimEvents();
