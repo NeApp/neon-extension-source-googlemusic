@@ -60,7 +60,7 @@ export class GoogleMusicActivityService extends ActivityService {
     fetchMetadata(item) {
         let albumId = Get(item.album.keys, [Plugin.id, 'id']);
 
-        if(IsNil(albumId)) {
+        if(IsNil(albumId) || !albumId) {
             return Promise.resolve(item);
         }
 
