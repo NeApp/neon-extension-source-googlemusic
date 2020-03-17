@@ -121,9 +121,7 @@ export default class PlayerMonitor extends EventEmitter {
 
         // Create album
         return Album.create(Plugin.id, {
-            keys: {
-                id: this._getId(id)
-            },
+            keys: this._getKeys(id),
 
             // Metadata
             title
@@ -138,13 +136,23 @@ export default class PlayerMonitor extends EventEmitter {
 
         // Create artist
         return Artist.create(Plugin.id, {
-            keys: {
-                id: this._getId(id)
-            },
+            keys: this._getKeys(id),
 
             // Metadata
             title
         });
+    }
+
+    _getKeys(id) {
+        id = this._getId(id);
+
+        let keys = {};
+
+        if(!IsNil(id) && id) {
+            keys.id = id;
+        }
+
+        return keys;
     }
 
     _getId(value) {
