@@ -38,7 +38,7 @@ export class GoogleMusicActivityService extends ActivityService {
 
         // Construct activity engine
         this.engine = new ActivityEngine(this.plugin, {
-            fetchMetadata: this.fetchMetadata.bind(this),
+            getMetadata: this.getMetadata.bind(this),
 
             isEnabled: () => true
         });
@@ -57,7 +57,7 @@ export class GoogleMusicActivityService extends ActivityService {
         });
     }
 
-    fetchMetadata(item) {
+    getMetadata(item) {
         let albumId = Get(item.album.keys, [Plugin.id, 'id']);
 
         if(IsNil(albumId) || !albumId) {
@@ -120,6 +120,13 @@ export class GoogleMusicActivityService extends ActivityService {
                 number: track.number,
                 duration: track.duration
             });
+
+            return item;
+        }, (err) => {
+            console.log('Unable to fetch album:', err);
+
+            // Delete album identifier
+            delete item.album.keys[Plugin.id].id;
 
             return item;
         });
